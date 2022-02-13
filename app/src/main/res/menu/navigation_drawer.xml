@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navigation_products"
-        android:title="Products"
-        android:checked="true" />
-    <item
         android:id="@+id/navigation_home"
         android:title="Home"
+        android:checked="true" />
+    <item
+        android:id="@+id/navigation_products"
+        android:title="Продукты"
+        android:checked="true" />
+    <item
+        android:id="@+id/navigation_log_out"
+        android:title="Выйти"
+        android:checked="true" />
+    <item
+        android:id="@+id/navigation_shift"
+        android:title="Смена"
         android:checked="true" />
 </menu>

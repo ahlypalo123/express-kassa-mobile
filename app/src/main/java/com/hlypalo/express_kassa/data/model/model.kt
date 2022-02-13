@@ -2,23 +2,16 @@ package com.hlypalo.express_kassa.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.squareup.moshi.JsonClass
+import java.io.Serializable
 
-data class Anime(
-    val image_url: String,
-    val title: String
-)
-
-data class Result(
-    val results: List<Anime>
-)
-
-@Entity
+@JsonClass(generateAdapter = true)
 data class Product (
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    var id: Long,
     val name: String,
     val price: Float,
-    val photo_url: String?,
-)
+    var photoUrl: String?
+) : Serializable
 
 @Entity
 data class CartProduct (
@@ -27,8 +20,15 @@ data class CartProduct (
     val price: Float
 )
 
-data class CartDto (
-    val name: String,
-    val price: Float,
-    val count: Int
+data class ShiftDetails (
+    val id: Long,
+    val employeeName: String,
+    val startDate: Long,
+    val endDate: Long
+)
+
+@Entity
+data class Check (
+    @PrimaryKey(autoGenerate = true) val id: Long,
+    val total: Float
 )

@@ -1,10 +1,12 @@
 package com.hlypalo.express_kassa.ui.main
 
+import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.hlypalo.express_kassa.data.model.CartDto
 import com.hlypalo.express_kassa.data.model.CartProduct
 import com.hlypalo.express_kassa.data.model.Product
 import com.hlypalo.express_kassa.data.repository.ProductRepository
+import com.hlypalo.express_kassa.util.calculateTotal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,28 +23,39 @@ class MainPresenter(
     private val repo: ProductRepository = ProductRepository()
     private val list: MutableList<Product> = mutableListOf()
     private val filteredList: MutableList<Product> = mutableListOf()
-    private val cartLiveData = repo.getProductsFromCart()
+    private val cartLiveData = repo.getProductsFromCartLiveData()
 
     fun init() {
         fetchProductList()
         cartLiveData.observe(lifecycleOwner) {
             view.updateCart()
+            val total: Float = cartLiveData.value.calculateTotal()
+            view.updateTotal(total)
         }
     }
 
-    private fun fetchProductList() = launch {
-        list.clear()
-        list.addAll(repo.getProductList())
-        withContext(Dispatchers.Main) {
-            update()
+    private fun fetchProductList() {
+        repo.fetchProductList {
+            onResponse = func@{
+                it ?: return@func
+                list.clear()
+                list.addAll(it)
+                updateFilteredList()
+            }
+            onError = {
+
+            }
         }
     }
 
-    fun update() = launch {
+    fun updateFilteredList() = launch {
         filteredList.clear()
-        val filter = view.getFilter() ?: return@launch
+        if (view.getFilter() == null) {
+            filteredList.addAll(list)
+            return@launch
+        }
         filteredList.addAll(
-            list.filter { p -> p.name.contains(filter) }
+            list.filter { p -> p.name.contains(view.getFilter()!!) }
         )
         withContext(Dispatchers.Main) {
             view.updateProductList()

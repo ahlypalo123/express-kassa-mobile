@@ -8,23 +8,22 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.GlideBuilder
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.CartDto
-import com.hlypalo.express_kassa.data.model.CartProduct
-import com.hlypalo.express_kassa.data.model.Product
-import com.hlypalo.express_kassa.ui.auth.LoginFragment
 import com.hlypalo.express_kassa.ui.check.CheckFragment
+import com.hlypalo.express_kassa.ui.view.ProductAdapter
 import com.hlypalo.express_kassa.util.inflate
-import com.hlypalo.express_kassa.util.loadUrlNoCache
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.item_cart.view.*
-import kotlinx.android.synthetic.main.item_product.view.*
 
 class MainFragment : Fragment(), MainView {
 
     private val presenter: MainPresenter by lazy { MainPresenter(this, this) }
-    private val productAdapter: ProductAdapter by lazy { ProductAdapter() }
+    private val productAdapter: ProductAdapter by lazy {
+        ProductAdapter(presenter.getProductList()) {
+            presenter.addProductToCart(it)
+        }
+    }
     private val cartAdapter: CartAdapter by lazy { CartAdapter() }
 
     override fun onCreateView(
@@ -47,7 +46,7 @@ class MainFragment : Fragment(), MainView {
         presenter.init()
 
         input_main_filter?.addTextChangedListener {
-            presenter.update()
+            presenter.updateFilteredList()
         }
 
         btn_check_pay?.setOnClickListener {
@@ -66,32 +65,13 @@ class MainFragment : Fragment(), MainView {
         cartAdapter.notifyDataSetChanged()
     }
 
-    override fun getFilter(): String? {
-        return input_main_filter?.text?.toString()
+    override fun updateTotal(total: Float) {
+        btn_check_pay?.isEnabled = total != 0F
+        btn_check_pay?.text = "Оплатить $total"
     }
 
-    inner class ProductAdapter : RecyclerView.Adapter<ProductAdapter.ViewHolder>() {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            return ViewHolder(parent.inflate(R.layout.item_product))
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(presenter.getProductList()[position])
-        }
-
-        override fun getItemCount(): Int = presenter.getProductList().size
-
-        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            fun bind(item: Product) = with(itemView) {
-                text_product_name?.text = item.name
-                text_product_price?.text = item.price.toString()
-                image_product?.loadUrlNoCache(item.photo_url, R.drawable.image)
-                setOnClickListener {
-                    presenter.addProductToCart(item)
-                }
-            }
-        }
+    override fun getFilter(): String? {
+        return input_main_filter?.text?.toString()
     }
 
     inner class CartAdapter : RecyclerView.Adapter<CartAdapter.ViewHolder>() {

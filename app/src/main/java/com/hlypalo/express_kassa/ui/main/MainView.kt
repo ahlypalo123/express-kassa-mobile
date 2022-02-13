@@ -8,4 +8,6 @@ interface MainView {
 
     fun updateCart()
 
+    fun updateTotal(total: Float)
+
 }

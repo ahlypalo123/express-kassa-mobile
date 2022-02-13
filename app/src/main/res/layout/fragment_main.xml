@@ -50,7 +50,7 @@
         android:id="@+id/btn_check_pay"
         android:layout_width="match_parent"
         android:textAllCaps="false"
-        android:text="Войти"
+        tools:text="Оплатить"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent" />
 

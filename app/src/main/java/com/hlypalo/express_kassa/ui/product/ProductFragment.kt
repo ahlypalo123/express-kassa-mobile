@@ -7,14 +7,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.Product
+import com.hlypalo.express_kassa.data.repository.ProductRepository
+import com.hlypalo.express_kassa.ui.view.ProductAdapter
 import com.hlypalo.express_kassa.util.inflate
-import com.hlypalo.express_kassa.util.loadUrlNoCache
+import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_products.*
 import kotlinx.android.synthetic.main.item_product.view.*
 
-class ProductFragment : Fragment(), ProductView {
+class ProductFragment : Fragment() {
 
-    private val presenter: ProductPresenter by lazy { ProductPresenter(this, this) }
+    private val repo: ProductRepository by lazy { ProductRepository() }
+    private val list: MutableList<Product> by lazy { mutableListOf() }
     private val adapter: Adapter by lazy { Adapter() }
 
     companion object {
@@ -34,7 +37,14 @@ class ProductFragment : Fragment(), ProductView {
         list_products?.layoutManager = LinearLayoutManager(context)
         list_products?.adapter = adapter
 
-        presenter.init()
+        repo.fetchProductList {
+            onResponse = func@{
+                it ?: return@func
+                list.clear()
+                list.addAll(it)
+                updateList()
+            }
+        }
         btn_product_add?.setOnClickListener {
             activity?.supportFragmentManager
                 ?.beginTransaction()
@@ -43,23 +53,36 @@ class ProductFragment : Fragment(), ProductView {
         }
     }
 
-    override fun updateList() {
+    private fun updateList() {
         adapter.notifyDataSetChanged()
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.order) {
             ORDER_DELETE -> {
-                presenter.deleteProduct(item.groupId)
+                deleteProduct(item.groupId)
             }
             ORDER_EDIT -> {
-                presenter.onEditProductSelected(item.groupId)
+                showEditProductDialog(list[item.groupId])
             }
         }
         return super.onContextItemSelected(item)
     }
 
-    override fun showEditProductDialog(product: Product) {
+    private fun deleteProduct(position: Int) {
+        val product = list[position]
+        repo.deleteProduct(product.id) {
+            onResponse = {
+                list.remove(product)
+                updateList()
+            }
+            onError = {
+                activity?.showError(it)
+            }
+        }
+    }
+
+    private fun showEditProductDialog(product: Product) {
         // TODO
     }
 
@@ -70,16 +93,14 @@ class ProductFragment : Fragment(), ProductView {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(presenter.getProductList()[position])
+            holder.bind(list[position])
         }
 
-        override fun getItemCount(): Int = presenter.getProductList().size
+        override fun getItemCount(): Int = list.size
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
             fun bind(item: Product) = with(itemView) {
-                text_product_name?.text = item.name
-                text_product_price?.text = item.price.toString()
-                image_product?.loadUrlNoCache(item.photo_url, R.drawable.image)
+                ProductAdapter.ViewHolder(itemView).bind(item)
                 setOnCreateContextMenuListener(this@ViewHolder)
             }
 
@@ -95,5 +116,4 @@ class ProductFragment : Fragment(), ProductView {
             }
         }
     }
-
 }

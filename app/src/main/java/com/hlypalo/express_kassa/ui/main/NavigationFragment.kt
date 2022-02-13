@@ -9,9 +9,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import com.hlypalo.express_kassa.App
+import com.hlypalo.express_kassa.MainActivity
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.ui.auth.LoginFragment
 import com.hlypalo.express_kassa.ui.product.ProductFragment
+import com.hlypalo.express_kassa.ui.shift.ShiftFragment
+import com.hlypalo.express_kassa.util.PREF_TOKEN
 import kotlinx.android.synthetic.main.fragment_navigation.*
 
 class NavigationFragment : Fragment() {
@@ -36,21 +39,37 @@ class NavigationFragment : Fragment() {
 
         navigation?.setNavigationItemSelectedListener func@{ item ->
             Toast.makeText(context, "You've selected $item", Toast.LENGTH_LONG).show()
-            val fragment = when (item.itemId) {
+            when (item.itemId) {
                 R.id.navigation_products -> {
                     ProductFragment()
                 }
                 R.id.navigation_home -> {
                     MainFragment()
                 }
+                R.id.navigation_shift -> {
+                    ShiftFragment()
+                }
+                R.id.navigation_log_out -> {
+                    logout()
+                    null
+                }
                 else -> {
                     MainFragment()
                 }
+            }?.let {
+                pushFragment(it)
             }
-            pushFragment(fragment)
             layout_navigation?.closeDrawers()
             return@func true
         }
+    }
+
+    private fun logout() {
+        App.prefEditor.putString(PREF_TOKEN, null).commit()
+        context?.let {
+            startActivity(MainActivity.getStartIntent(it))
+        }
+        activity?.finish()
     }
 
     private fun pushFragment(fragment: Fragment) {

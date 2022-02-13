@@ -1,19 +1,21 @@
 package com.hlypalo.express_kassa.ui.auth
 
 import android.os.Bundle
-import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.text.buildSpannedString
+import androidx.core.text.color
 import androidx.fragment.app.Fragment
+import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.ApiService
-import com.hlypalo.express_kassa.data.model.AuthenticationDto
-import com.hlypalo.express_kassa.ui.main.MainFragment
+import com.hlypalo.express_kassa.data.model.AuthenticationRequest
 import com.hlypalo.express_kassa.ui.main.NavigationFragment
-import com.hlypalo.express_kassa.util.appendClickable
+import com.hlypalo.express_kassa.util.PREF_TOKEN
 import com.hlypalo.express_kassa.util.enqueue
+import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_login.*
 
 class LoginFragment : Fragment() {
@@ -29,26 +31,41 @@ class LoginFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val sb = SpannableStringBuilder()
-        sb.append("Нет аккаунта? ")
-        sb.appendClickable("Зарегистрироваться") {
+        val span = buildSpannedString {
+            append("Нет аккаунта? ")
+            context?.let {
+                color(ContextCompat.getColor(it, R.color.design_default_color_primary)) {
+                    append("Зарегистрироваться")
+                }
+            }
+        }
+
+        text_login_register?.text = span
+
+        text_login_register?.setOnClickListener {
             activity?.supportFragmentManager
                 ?.beginTransaction()
                 ?.replace(R.id.container, RegisterFragment())
                 ?.addToBackStack(null)?.commit()
         }
-        text_login_register.setText(sb, TextView.BufferType.SPANNABLE)
 
         btn_login?.setOnClickListener {
             val email = input_login_email?.text.toString()
             val password = input_login_password?.text.toString()
-            val dto = AuthenticationDto(email, password)
+            val dto = AuthenticationRequest(email, password)
             api.login(dto).enqueue {
-                // TODO
-                activity?.supportFragmentManager
-                    ?.beginTransaction()
-                    ?.replace(R.id.container, NavigationFragment())
-                    ?.addToBackStack(null)?.commit()
+                onResponse = {
+                    App.prefEditor
+                        .putString(PREF_TOKEN, it)
+                        .commit()
+                    activity?.supportFragmentManager
+                        ?.beginTransaction()
+                        ?.replace(R.id.container, NavigationFragment())
+                        ?.addToBackStack(null)?.commit()
+                }
+                onError = {
+                    activity?.showError(it)
+                }
             }
         }
     }

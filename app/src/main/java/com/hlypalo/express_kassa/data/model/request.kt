@@ -1,10 +1,19 @@
 package com.hlypalo.express_kassa.data.model
 
-data class AuthenticationDto (
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+data class AuthenticationRequest (
     val email: String,
     val password: String
 )
 
+@JsonClass(generateAdapter = true)
+data class ShiftRequest(
+    val employee_name: String
+)
+
+@JsonClass(generateAdapter = true)
 data class SaveCheckRequest (
     val discount: Float?,
     val customerName: String?,
