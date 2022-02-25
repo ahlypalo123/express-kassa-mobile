@@ -57,11 +57,19 @@ class ProductRepository : CoroutineScope {
         api.deleteProduct(id).enqueue(callback)
     }
 
-    suspend fun getProductsFromCart() : List<CartDto> {
-        return App.db.cartDao().getAllWithCount()
+    suspend fun getProductsFromCartGrouped() : List<CartDto> {
+        return App.db.cartDao().getAllGrouped()
     }
 
     fun getProductsFromCartLiveData() : LiveData<List<CartDto>> {
-        return App.db.cartDao().getAllWithCountLiveData()
+        return App.db.cartDao().getAllGroupedLiveData()
+    }
+
+    suspend fun getProductsFromCart() : List<CartProduct> {
+        return App.db.cartDao().getAll()
+    }
+
+    suspend fun deleteProductFromCartByName(name: String) {
+        App.db.cartDao().deleteByName(name)
     }
 }

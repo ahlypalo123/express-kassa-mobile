@@ -1,4 +1,4 @@
-package com.hlypalo.express_kassa.ui.main
+package com.hlypalo.express_kassa.ui.base
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.MainActivity
 import com.hlypalo.express_kassa.R
+import com.hlypalo.express_kassa.ui.check.CheckHistoryFragment
+import com.hlypalo.express_kassa.ui.main.MainFragment
 import com.hlypalo.express_kassa.ui.product.ProductFragment
 import com.hlypalo.express_kassa.ui.shift.ShiftFragment
 import com.hlypalo.express_kassa.util.PREF_TOKEN
@@ -52,6 +54,9 @@ class NavigationFragment : Fragment() {
                 R.id.navigation_log_out -> {
                     logout()
                     null
+                }
+                R.id.navigation_history -> {
+                    CheckHistoryFragment()
                 }
                 else -> {
                     MainFragment()

@@ -16,4 +16,8 @@
         android:id="@+id/navigation_shift"
         android:title="Смена"
         android:checked="true" />
+    <item
+        android:id="@+id/navigation_history"
+        android:title="История чеков"
+        android:checked="true" />
 </menu>

@@ -10,7 +10,8 @@ data class Product (
     var id: Long,
     val name: String,
     val price: Float,
-    var photoUrl: String?
+    var photoUrl: String?,
+    val barCode: String
 ) : Serializable
 
 @Entity
@@ -28,7 +29,15 @@ data class ShiftDetails (
 )
 
 @Entity
+@JsonClass(generateAdapter = true)
 data class Check (
     @PrimaryKey(autoGenerate = true) val id: Long,
-    val total: Float
+    val total: Float,
+    val discount: Float?,
+    val paymentMethod: PaymentMethod,
+    val customerName: String?,
+    val customerLast4: Int?,
+    val products: List<CartProduct>,
+    val date: Long,
+    val employeeName: String
 )

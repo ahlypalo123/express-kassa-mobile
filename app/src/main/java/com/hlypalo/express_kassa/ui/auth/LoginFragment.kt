@@ -12,7 +12,7 @@ import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.AuthenticationRequest
-import com.hlypalo.express_kassa.ui.main.NavigationFragment
+import com.hlypalo.express_kassa.ui.base.NavigationFragment
 import com.hlypalo.express_kassa.util.PREF_TOKEN
 import com.hlypalo.express_kassa.util.enqueue
 import com.hlypalo.express_kassa.util.showError
@@ -46,6 +46,13 @@ class LoginFragment : Fragment() {
             activity?.supportFragmentManager
                 ?.beginTransaction()
                 ?.replace(R.id.container, RegisterFragment())
+                ?.addToBackStack(null)?.commit()
+        }
+
+        text_forgot_password?.setOnClickListener {
+            activity?.supportFragmentManager
+                ?.beginTransaction()
+                ?.replace(R.id.container, ForgotPasswordFragment())
                 ?.addToBackStack(null)?.commit()
         }
 

@@ -5,45 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/input_main_filter"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager_main"
         android:layout_width="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="500dp"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list_products"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout_main"
         android:layout_width="match_parent"
-        tools:listitem="@layout/item_product"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/list_cart"
-        app:layout_constraintTop_toBottomOf="@id/input_main_filter" />
-
-<!--    <androidx.viewpager.widget.ViewPager-->
-<!--        android:id="@+id/pager_main"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/tabLayout"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/input_main_filter" />-->
-
-<!--    <com.google.android.material.tabs.TabLayout-->
-<!--        android:id="@+id/tabLayout"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/view2" />-->
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/pager_main" />
 
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="@android:drawable/divider_horizontal_bright"
-        app:layout_constraintBottom_toBottomOf="@+id/list_products" />
+        app:layout_constraintBottom_toTopOf="@+id/list_cart" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_cart"
         android:layout_width="match_parent"
-        android:layout_height="168dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_check_pay"
+        app:layout_constraintTop_toBottomOf="@+id/tab_layout_main"
         tools:listitem="@layout/item_cart" />
 
     <com.google.android.material.button.MaterialButton

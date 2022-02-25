@@ -1,10 +1,7 @@
 package com.hlypalo.express_kassa.data.api
 
 import com.google.gson.GsonBuilder
-import com.hlypalo.express_kassa.data.model.AuthenticationRequest
-import com.hlypalo.express_kassa.data.model.Product
-import com.hlypalo.express_kassa.data.model.ShiftDetails
-import com.hlypalo.express_kassa.data.model.ShiftRequest
+import com.hlypalo.express_kassa.data.model.*
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Deferred
 import okhttp3.MultipartBody
@@ -54,6 +51,20 @@ interface ApiService {
     @Headers("action: CLOSE_SHIFT")
     fun closeShift() : Call<Unit>
 
+    @POST("/check")
+    fun saveCheckAsync(@Body data: Check) : Deferred<Response<Unit>>
+
+    @GET("/check")
+    fun getCheckHistoryAsync() : Deferred<Response<List<Check>>>
+
+    @POST("/auth/forgot-password")
+    fun forgotPassword(@Body req: AuthenticationRequest) : Call<Unit>
+
+    @POST("/auth/validate")
+    fun validate(@Body req: ValidateRequest) : Call<Unit>
+
+    @PUT("/merchant/update-password")
+    fun updatePassword(@Body req: AuthenticationRequest) : Call<Unit>
 
     companion object {
         var apiService: ApiService? = null

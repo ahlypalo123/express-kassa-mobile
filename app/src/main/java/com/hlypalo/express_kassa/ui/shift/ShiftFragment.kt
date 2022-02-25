@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isEmpty
 import androidx.fragment.app.Fragment
+import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.ShiftDetails
 import com.hlypalo.express_kassa.data.model.ShiftRequest
+import com.hlypalo.express_kassa.util.PREF_EMPLOYEE_NAME
 import com.hlypalo.express_kassa.util.enqueue
 import kotlinx.android.synthetic.main.fragment_shift.*
 
@@ -66,6 +68,7 @@ class ShiftFragment : Fragment() {
                         onResponse = {
                             shift = it
                             updateUi()
+                            App.prefEditor.putString(PREF_EMPLOYEE_NAME, it?.employeeName)
                         }
                     }
                 }
@@ -78,6 +81,7 @@ class ShiftFragment : Fragment() {
                     onResponse = {
                         shift = null
                         updateUi()
+                        App.prefEditor.putString(PREF_EMPLOYEE_NAME, null)
                     }
                 }
             }

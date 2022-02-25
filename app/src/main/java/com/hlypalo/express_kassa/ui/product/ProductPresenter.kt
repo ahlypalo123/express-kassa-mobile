@@ -1,40 +1,25 @@
-package com.hlypalo.express_kassa.ui.main
+package com.hlypalo.express_kassa.ui.product
 
-import android.content.Context
-import androidx.lifecycle.LifecycleOwner
-import com.hlypalo.express_kassa.data.model.CartDto
 import com.hlypalo.express_kassa.data.model.CartProduct
 import com.hlypalo.express_kassa.data.model.Product
 import com.hlypalo.express_kassa.data.repository.ProductRepository
-import com.hlypalo.express_kassa.util.calculateTotal
+import com.hlypalo.express_kassa.util.showError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
-class MainPresenter(
-    private val view: MainView,
-    private val lifecycleOwner: LifecycleOwner
-) : CoroutineScope {
+class ProductPresenter(private val view: ProductView) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO
-    private val repo: ProductRepository = ProductRepository()
+        get() = Dispatchers.Main
+
     private val list: MutableList<Product> = mutableListOf()
     private val filteredList: MutableList<Product> = mutableListOf()
-    private val cartLiveData = repo.getProductsFromCartLiveData()
+    private val repo: ProductRepository = ProductRepository()
 
     fun init() {
-        fetchProductList()
-        cartLiveData.observe(lifecycleOwner) {
-            view.updateCart()
-            val total: Float = cartLiveData.value.calculateTotal()
-            view.updateTotal(total)
-        }
-    }
-
-    private fun fetchProductList() {
         repo.fetchProductList {
             onResponse = func@{
                 it ?: return@func
@@ -44,6 +29,23 @@ class MainPresenter(
             }
             onError = {
 
+            }
+        }
+    }
+
+    fun getProductList() : List<Product> {
+        return filteredList
+    }
+
+    fun deleteProduct(position: Int) {
+        val product = list[position]
+        repo.deleteProduct(product.id) {
+            onResponse = {
+                list.remove(product)
+                view.updateList()
+            }
+            onError = {
+                view.showError(it)
             }
         }
     }
@@ -58,20 +60,12 @@ class MainPresenter(
             list.filter { p -> p.name.contains(view.getFilter()!!) }
         )
         withContext(Dispatchers.Main) {
-            view.updateProductList()
+            view.updateList()
         }
-    }
-
-    fun getProductList() : List<Product> {
-        return filteredList
     }
 
     fun addProductToCart(data: Product) = launch {
         repo.addProductToCart(CartProduct(0, data.name, data.price))
-    }
-
-    fun getProductListForCart(): List<CartDto> {
-        return cartLiveData.value ?: listOf()
     }
 
 }

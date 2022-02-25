@@ -2,4 +2,7 @@
     <string name="app_name">express_kassa</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="date">Date</string>
+    <string name="location">Location</string>
+    <string name="total">Total</string>
 </resources>

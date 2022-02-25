@@ -2,23 +2,24 @@ package com.hlypalo.express_kassa.ui.product
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hlypalo.express_kassa.R
+import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.data.model.Product
-import com.hlypalo.express_kassa.data.repository.ProductRepository
-import com.hlypalo.express_kassa.ui.view.ProductAdapter
+import com.hlypalo.express_kassa.ui.main.MainFragment
 import com.hlypalo.express_kassa.util.inflate
+import com.hlypalo.express_kassa.util.loadUrlNoCache
 import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_products.*
 import kotlinx.android.synthetic.main.item_product.view.*
 
-class ProductFragment : Fragment() {
+class ProductFragment : Fragment(), ProductView {
 
-    private val repo: ProductRepository by lazy { ProductRepository() }
-    private val list: MutableList<Product> by lazy { mutableListOf() }
-    private val adapter: Adapter by lazy { Adapter() }
+    private val presenter: ProductPresenter by lazy { ProductPresenter(this) }
+    private val adapter: Adapter by lazy { Adapter(presenter.getProductList()) }
 
     companion object {
         private const val ORDER_DELETE = 0
@@ -33,18 +34,26 @@ class ProductFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_products, container, false)
     }
 
+    override fun getFilter(): String? {
+        return input_main_filter?.text?.toString()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         list_products?.layoutManager = LinearLayoutManager(context)
         list_products?.adapter = adapter
 
-        repo.fetchProductList {
-            onResponse = func@{
-                it ?: return@func
-                list.clear()
-                list.addAll(it)
-                updateList()
-            }
+        btn_product_add?.visibility = if (parentFragment is MainFragment) {
+            View.GONE
+        } else {
+            View.VISIBLE
         }
+
+        input_main_filter?.addTextChangedListener {
+            presenter.updateFilteredList()
+        }
+
+        presenter.init()
+
         btn_product_add?.setOnClickListener {
             activity?.supportFragmentManager
                 ?.beginTransaction()
@@ -53,55 +62,54 @@ class ProductFragment : Fragment() {
         }
     }
 
-    private fun updateList() {
+    override fun updateList() {
         adapter.notifyDataSetChanged()
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.order) {
             ORDER_DELETE -> {
-                deleteProduct(item.groupId)
+                presenter.deleteProduct(item.groupId)
             }
             ORDER_EDIT -> {
-                showEditProductDialog(list[item.groupId])
+                // showEditProductDialog(list[item.groupId])
             }
         }
         return super.onContextItemSelected(item)
-    }
-
-    private fun deleteProduct(position: Int) {
-        val product = list[position]
-        repo.deleteProduct(product.id) {
-            onResponse = {
-                list.remove(product)
-                updateList()
-            }
-            onError = {
-                activity?.showError(it)
-            }
-        }
     }
 
     private fun showEditProductDialog(product: Product) {
         // TODO
     }
 
-    inner class Adapter : RecyclerView.Adapter<Adapter.ViewHolder>() {
+    override fun showError(err: ErrorBody?) {
+        activity?.showError(err)
+    }
+
+    inner class Adapter(private val items: List<Product>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(parent.inflate(R.layout.item_product))
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(list[position])
+            holder.bind(items[position])
         }
 
-        override fun getItemCount(): Int = list.size
+        override fun getItemCount(): Int = items.size
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
             fun bind(item: Product) = with(itemView) {
-                ProductAdapter.ViewHolder(itemView).bind(item)
-                setOnCreateContextMenuListener(this@ViewHolder)
+                text_product_name?.text = item.name
+                text_product_price?.text = item.price.toString()
+                image_product?.loadUrlNoCache(item.photoUrl, R.drawable.image)
+                if (parentFragment is MainFragment) {
+                    setOnClickListener {
+                        presenter.addProductToCart(item)
+                    }
+                } else {
+                    setOnCreateContextMenuListener(this@ViewHolder)
+                }
             }
 
             override fun onCreateContextMenu(

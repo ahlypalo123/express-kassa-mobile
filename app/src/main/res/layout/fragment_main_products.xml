@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_complete"
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_products"
+        tools:listitem="@layout/item_product"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:text="complete"
-        android:textAllCaps="false"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/input_main_filter" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
