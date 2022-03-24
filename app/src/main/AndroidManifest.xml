@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Express_kassa">
         <activity android:name=".MainActivity"
-            android:theme="@style/Theme.MaterialComponents.NoActionBar"
+            android:theme="@style/Theme.Express_kassa"
             android:exported="true">
             <intent-filter>
                 <action

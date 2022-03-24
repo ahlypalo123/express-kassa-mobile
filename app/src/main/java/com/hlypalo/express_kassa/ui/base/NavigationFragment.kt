@@ -30,12 +30,7 @@ class NavigationFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val activity = activity as AppCompatActivity?
-        activity?.setSupportActionBar(toolbar)
-        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        // activity?.supportActionBar?.setHomeAsUpIndicator()
 
-        setHasOptionsMenu(true)
 
         pushFragment(MainFragment())
 
@@ -69,6 +64,10 @@ class NavigationFragment : Fragment() {
         }
     }
 
+    fun openDrawer() {
+        layout_navigation?.openDrawer(GravityCompat.START)
+    }
+
     private fun logout() {
         App.prefEditor.putString(PREF_TOKEN, null).commit()
         context?.let {
@@ -82,16 +81,6 @@ class NavigationFragment : Fragment() {
             ?.beginTransaction()
             ?.replace(R.id.content_navigation, fragment)
             ?.addToBackStack(null)?.commit()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                layout_navigation?.openDrawer(GravityCompat.START)
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
 }

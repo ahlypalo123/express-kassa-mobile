@@ -25,10 +25,10 @@ class ProductPresenter(private val view: ProductView) : CoroutineScope {
                 it ?: return@func
                 list.clear()
                 list.addAll(it)
-                updateFilteredList()
+                updateFilteredList(null)
             }
             onError = {
-
+                view.showError(it)
             }
         }
     }
@@ -50,14 +50,14 @@ class ProductPresenter(private val view: ProductView) : CoroutineScope {
         }
     }
 
-    fun updateFilteredList() = launch {
+    fun updateFilteredList(filter: String?) = launch {
         filteredList.clear()
-        if (view.getFilter() == null) {
+        if (filter.isNullOrBlank()) {
             filteredList.addAll(list)
             return@launch
         }
         filteredList.addAll(
-            list.filter { p -> p.name.contains(view.getFilter()!!) }
+            list.filter { p -> p.name.contains(filter) }
         )
         withContext(Dispatchers.Main) {
             view.updateList()

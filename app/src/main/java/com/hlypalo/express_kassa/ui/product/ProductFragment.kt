@@ -2,17 +2,21 @@ package com.hlypalo.express_kassa.ui.product
 
 import android.os.Bundle
 import android.view.*
-import androidx.core.widget.addTextChangedListener
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hlypalo.express_kassa.MainActivity.Companion.TAG_BASE_FRAGMENT
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.data.model.Product
+import com.hlypalo.express_kassa.ui.base.NavigationFragment
 import com.hlypalo.express_kassa.ui.main.MainFragment
 import com.hlypalo.express_kassa.util.inflate
 import com.hlypalo.express_kassa.util.loadUrlNoCache
 import com.hlypalo.express_kassa.util.showError
+import kotlinx.android.synthetic.main.fragment_navigation.*
 import kotlinx.android.synthetic.main.fragment_products.*
 import kotlinx.android.synthetic.main.item_product.view.*
 
@@ -34,11 +38,14 @@ class ProductFragment : Fragment(), ProductView {
         return inflater.inflate(R.layout.fragment_products, container, false)
     }
 
-    override fun getFilter(): String? {
-        return input_main_filter?.text?.toString()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val activity = activity as AppCompatActivity?
+        activity?.setSupportActionBar(toolbar)
+        activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
+        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
+        setHasOptionsMenu(true)
+
         list_products?.layoutManager = LinearLayoutManager(context)
         list_products?.adapter = adapter
 
@@ -46,10 +53,6 @@ class ProductFragment : Fragment(), ProductView {
             View.GONE
         } else {
             View.VISIBLE
-        }
-
-        input_main_filter?.addTextChangedListener {
-            presenter.updateFilteredList()
         }
 
         presenter.init()
@@ -60,6 +63,36 @@ class ProductFragment : Fragment(), ProductView {
                 ?.replace(R.id.content_navigation, AddProductFragment())
                 ?.addToBackStack(null)?.commit()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu, menu)
+
+        val searchBar = menu.findItem(R.id.search_bar).actionView as? SearchView
+
+        searchBar?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(filter: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(filter: String?): Boolean {
+                presenter.updateFilteredList(filter)
+                return true
+            }
+        })
+        return super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                val fragment = activity?.supportFragmentManager
+                    ?.findFragmentByTag(TAG_BASE_FRAGMENT)
+                (fragment as? NavigationFragment)?.openDrawer()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun updateList() {

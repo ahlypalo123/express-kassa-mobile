@@ -34,7 +34,7 @@ class LoginFragment : Fragment() {
         val span = buildSpannedString {
             append("Нет аккаунта? ")
             context?.let {
-                color(ContextCompat.getColor(it, R.color.design_default_color_primary)) {
+                color(ContextCompat.getColor(it, R.color.colorAccent)) {
                     append("Зарегистрироваться")
                 }
             }

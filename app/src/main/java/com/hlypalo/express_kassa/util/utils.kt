@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
 import java.lang.Exception
 import java.net.InetAddress
 

@@ -110,12 +110,15 @@ class AddProductFragment : Fragment() {
         }
     }
 
+    val barCode = ""
+
     private fun saveProduct() {
         val product = Product(
             0,
             name = input_product_name?.text.toString(),
             price = input_product_price?.text.toString().toFloat(),
-            null
+            null,
+            barCode = barCode
         )
 
         CoroutineScope(Dispatchers.IO).launch {

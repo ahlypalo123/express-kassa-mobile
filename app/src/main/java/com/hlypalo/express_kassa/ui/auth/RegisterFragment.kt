@@ -32,7 +32,7 @@ class RegisterFragment : Fragment() {
         val span = buildSpannedString {
             append("Уже зарегистрированы? ")
             context?.let {
-                color(ContextCompat.getColor(it, R.color.design_default_color_primary)) {
+                color(ContextCompat.getColor(it, R.color.colorAccent)) {
                     append("Войти")
                 }
             }

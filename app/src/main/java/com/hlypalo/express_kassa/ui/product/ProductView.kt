@@ -6,8 +6,6 @@ interface ProductView {
 
     fun updateList()
 
-    fun getFilter(): String?
-
     fun showError(err: ErrorBody?)
 
 }
