@@ -20,4 +20,8 @@
         android:id="@+id/navigation_history"
         android:title="История чеков"
         android:checked="true" />
+    <item
+        android:id="@+id/navigation_devices"
+        android:title="Устройства"
+        android:checked="true" />
 </menu>

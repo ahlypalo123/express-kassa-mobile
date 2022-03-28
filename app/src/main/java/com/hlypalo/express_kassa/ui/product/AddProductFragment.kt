@@ -1,6 +1,9 @@
 package com.hlypalo.express_kassa.ui.product
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
@@ -16,7 +19,10 @@ import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.Product
 import com.hlypalo.express_kassa.data.repository.ProductRepository
+import com.hlypalo.express_kassa.ui.activity.SimpleScannerActivity
+import com.hlypalo.express_kassa.util.EXTRA_BAR_CODE
 import com.hlypalo.express_kassa.util.PathUtil
+import com.hlypalo.express_kassa.util.compressToFile
 import kotlinx.android.synthetic.main.fragmet_add_product.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +35,8 @@ class AddProductFragment : Fragment() {
 
     private val repo: ProductRepository by lazy { ProductRepository() }
     private var currentPhotoPath: String = ""
+    private var barCode: String? = null
+    private var bitmap: Bitmap? = null
 
     private val requestCameraPermissions = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -43,6 +51,15 @@ class AddProductFragment : Fragment() {
     ) { isGranted ->
         if (isGranted) {
             requestGetContent.launch("image/*")
+        }
+    }
+
+    private val requestBarCode = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            barCode = result.data?.getStringExtra(EXTRA_BAR_CODE)
+            input_product_barcode?.setText(barCode)
         }
     }
 
@@ -63,9 +80,8 @@ class AddProductFragment : Fragment() {
     }
 
     private fun updateImage() {
-        image_product?.setImageBitmap(
-            BitmapFactory.decodeFile(currentPhotoPath)
-        )
+        bitmap = BitmapFactory.decodeFile(currentPhotoPath)
+        image_product?.setImageBitmap(bitmap)
     }
 
     private fun dispatchTakePicture() {
@@ -105,12 +121,18 @@ class AddProductFragment : Fragment() {
             saveProduct()
         }
 
+        input_product_barcode?.setOnFocusChangeListener { _, b ->
+            if (b) {
+                input_product_barcode?.clearFocus()
+                val intent = Intent(activity, SimpleScannerActivity::class.java)
+                requestBarCode.launch(intent)
+            }
+        }
+
         image_product?.setOnClickListener {
             openPhotoOptionsDialog()
         }
     }
-
-    val barCode = ""
 
     private fun saveProduct() {
         val product = Product(
@@ -122,9 +144,9 @@ class AddProductFragment : Fragment() {
         )
 
         CoroutineScope(Dispatchers.IO).launch {
-            if (currentPhotoPath.isNotBlank()) {
-                repo.uploadPhoto(File(currentPhotoPath))?.let {
-                    product.photoUrl = ApiService.BASE_URL + it
+            bitmap?.compressToFile(context)?.let { photo ->
+                repo.uploadPhoto(photo)?.let {
+                    product.photoUrl = it
                 }
             }
             repo.addProduct(product)

@@ -61,6 +61,10 @@ class ProductRepository : CoroutineScope {
         return App.db.cartDao().getAllGrouped()
     }
 
+    suspend fun deleteProductsFromCart() {
+        App.db.cartDao().deleteAll()
+    }
+
     fun getProductsFromCartLiveData() : LiveData<List<CartDto>> {
         return App.db.cartDao().getAllGroupedLiveData()
     }

@@ -29,4 +29,7 @@ interface CartDao {
 
     @Query("DELETE FROM cartproduct where name = :name")
     suspend fun deleteByName(name: String)
+
+    @Query("DELETE FROM cartproduct")
+    suspend fun deleteAll()
 }

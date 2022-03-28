@@ -43,20 +43,37 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/input_product_price"
             android:layout_width="match_parent"
+            android:inputType="number"
             android:hint="Цена"
             android:layout_height="wrap_content">
         </com.google.android.material.textfield.TextInputEditText>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_product_barcode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_product_price">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_product_barcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Штрих код" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_product_add"
         android:layout_width="match_parent"
         android:layout_height="64dp"
-        android:textAllCaps="false"
         android:layout_margin="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:text="Добавить"
-        app:layout_constraintTop_toBottomOf="@+id/layout_product_price" />
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_product_barcode" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,14 +7,14 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hlypalo.express_kassa.MainActivity.Companion.TAG_BASE_FRAGMENT
 import com.hlypalo.express_kassa.R
+import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.data.model.Product
 import com.hlypalo.express_kassa.ui.base.NavigationFragment
 import com.hlypalo.express_kassa.ui.main.MainFragment
 import com.hlypalo.express_kassa.util.inflate
-import com.hlypalo.express_kassa.util.loadUrlNoCache
+import com.hlypalo.express_kassa.util.loadImageUrl
 import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_navigation.*
 import kotlinx.android.synthetic.main.fragment_products.*
@@ -87,7 +87,7 @@ class ProductFragment : Fragment(), ProductView {
         when (item.itemId) {
             android.R.id.home -> {
                 val fragment = activity?.supportFragmentManager
-                    ?.findFragmentByTag(TAG_BASE_FRAGMENT)
+                    ?.findFragmentByTag(NavigationFragment::class.java.simpleName)
                 (fragment as? NavigationFragment)?.openDrawer()
                 return true
             }
@@ -135,7 +135,12 @@ class ProductFragment : Fragment(), ProductView {
             fun bind(item: Product) = with(itemView) {
                 text_product_name?.text = item.name
                 text_product_price?.text = item.price.toString()
-                image_product?.loadUrlNoCache(item.photoUrl, R.drawable.image)
+                if (!item.photoUrl.isNullOrBlank()) {
+                    image_product?.loadImageUrl(
+                        ApiService.BASE_URL + item.photoUrl,
+                        R.drawable.image
+                    )
+                }
                 if (parentFragment is MainFragment) {
                     setOnClickListener {
                         presenter.addProductToCart(item)

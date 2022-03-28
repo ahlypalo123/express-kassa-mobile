@@ -8,7 +8,8 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager_main"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/tab_layout_main"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.tabs.TabLayout
@@ -16,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/pager_main"
+        app:layout_constraintBottom_toTopOf="@id/list_cart"
         tools:layout_editor_absoluteX="16dp" />
 
     <View
@@ -29,9 +30,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_cart"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="128dp"
+        android:nestedScrollingEnabled="false"
         app:layout_constraintBottom_toTopOf="@+id/btn_check_pay"
-        app:layout_constraintTop_toBottomOf="@+id/tab_layout_main"
         tools:listitem="@layout/item_cart" />
 
     <com.google.android.material.button.MaterialButton

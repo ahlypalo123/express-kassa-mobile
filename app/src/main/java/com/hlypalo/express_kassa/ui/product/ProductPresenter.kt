@@ -54,11 +54,11 @@ class ProductPresenter(private val view: ProductView) : CoroutineScope {
         filteredList.clear()
         if (filter.isNullOrBlank()) {
             filteredList.addAll(list)
-            return@launch
+        } else {
+            filteredList.addAll(
+                list.filter { p -> p.name.contains(filter) }
+            )
         }
-        filteredList.addAll(
-            list.filter { p -> p.name.contains(filter) }
-        )
         withContext(Dispatchers.Main) {
             view.updateList()
         }

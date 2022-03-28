@@ -67,7 +67,11 @@ class LoginFragment : Fragment() {
                         .commit()
                     activity?.supportFragmentManager
                         ?.beginTransaction()
-                        ?.replace(R.id.container, NavigationFragment())
+                        ?.replace(
+                            R.id.container,
+                            NavigationFragment(),
+                            NavigationFragment::class.java.simpleName
+                        )
                         ?.addToBackStack(null)?.commit()
                 }
                 onError = {

@@ -1,6 +1,7 @@
 package com.hlypalo.express_kassa.util
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ClickableSpan
@@ -24,10 +25,15 @@ import androidx.core.content.ContextCompat.getSystemService
 
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Environment
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
+import org.joda.time.DateTime
+import java.io.File
+import java.io.FileOutputStream
 import java.lang.Exception
 import java.net.InetAddress
+import java.util.*
 
 
 const val TAG = "Utils"
@@ -88,10 +94,9 @@ fun SpannableStringBuilder.appendClickable(
     setSpan(span, index, length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
 }
 
-fun ImageView.loadUrlNoCache(url: String?, placeholder: Int) {
+fun ImageView.loadImageUrl(url: String?, placeholder: Int) {
     GlideApp.with(context).load(url?.trim())
         .diskCacheStrategy(DiskCacheStrategy.NONE)
-        .skipMemoryCache(true)
         .placeholder(placeholder)
         .into(this)
 }
@@ -137,3 +142,16 @@ fun Context.isNetworkAvailable() =
                     || hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
         } ?: false
     }
+
+fun Bitmap.compressToFile(context: Context?) : File {
+    val timeStamp = DateTime.now().toString("yyyyMMdd_HHmmss")
+    val storageDir = context?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    val temp = File.createTempFile(
+        "JPEG_${timeStamp}_COMPRESSED",
+        ".jpg",
+        storageDir
+    )
+    val fos = FileOutputStream(temp)
+    compress(Bitmap.CompressFormat.JPEG, 30, fos)
+    return temp
+}

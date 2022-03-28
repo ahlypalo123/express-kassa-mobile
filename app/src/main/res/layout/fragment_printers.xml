@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/MyActionBar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:fitsSystemWindows="true"
+        android:minHeight="?attr/actionBarSize" />
+
+    <TextView
+        android:id="@+id/text_connected"
+        android:layout_width="wrap_content"
+        android:padding="16dp"
+        tools:text="No devices connected"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/title_paired_devices"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:textSize="16sp"
+        android:text="Bluetooth Printers"
+        android:textColor="#fff" />
+
+    <ListView
+        android:id="@+id/paired_devices"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#fff" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_test"
+        android:layout_width="match_parent"
+        android:textColor="@color/white"
+        android:layout_gravity="bottom"
+        android:text="Print test page"
+        android:layout_height="wrap_content" />
+</LinearLayout>

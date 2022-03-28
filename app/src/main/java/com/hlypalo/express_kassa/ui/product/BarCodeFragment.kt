@@ -1,11 +1,11 @@
 package com.hlypalo.express_kassa.ui.product
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.R
@@ -19,8 +19,10 @@ import kotlinx.android.synthetic.main.fragment_products.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import me.dm7.barcodescanner.zbar.Result
+import me.dm7.barcodescanner.zbar.ZBarScannerView
 
-class BarCodeFragment : Fragment() {
+class BarCodeFragment : Fragment(), ZBarScannerView.ResultHandler {
 
     private val repo: ProductRepository by lazy { ProductRepository() }
     private val list: MutableList<Product> by lazy { mutableListOf() }
@@ -62,13 +64,19 @@ class BarCodeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        scanner_view?.setResultHandler {
-            CoroutineScope(Dispatchers.IO).launch {
-                list.firstOrNull { p -> p.barCode == it.contents }?.let { p ->
-                    repo.addProductToCart(CartProduct(0, p.name, p.price))
-                }
+        scanner_view?.setResultHandler(this)
+        scanner_view?.startCamera()
+    }
+
+    override fun handleResult(rawResult: Result?) {
+        MediaPlayer.create(context, R.raw.beep).start()
+        CoroutineScope(Dispatchers.IO).launch {
+            list.firstOrNull { p -> p.barCode == rawResult?.contents }?.let { p ->
+                repo.addProductToCart(CartProduct(0, p.name, p.price))
             }
         }
-        scanner_view?.startCamera()
+        view?.postDelayed({
+            scanner_view?.resumeCameraPreview(this)
+        }, 2500)
     }
 }

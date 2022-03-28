@@ -11,7 +11,7 @@ data class Product (
     val name: String,
     val price: Float,
     var photoUrl: String?,
-    val barCode: String
+    val barCode: String?
 ) : Serializable
 
 @Entity

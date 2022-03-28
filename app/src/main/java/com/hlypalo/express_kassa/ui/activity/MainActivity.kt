@@ -1,9 +1,11 @@
-package com.hlypalo.express_kassa
+package com.hlypalo.express_kassa.ui.activity
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.hlypalo.express_kassa.App
+import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.ui.auth.LoginFragment
 import com.hlypalo.express_kassa.ui.base.NavigationFragment
 import com.hlypalo.express_kassa.util.PREF_TOKEN
@@ -11,8 +13,6 @@ import com.hlypalo.express_kassa.util.PREF_TOKEN
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        const val TAG_BASE_FRAGMENT = "base_fragment"
-
         fun getStartIntent(context: Context): Intent {
             return Intent(context, MainActivity::class.java)
         }
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.container, fragment, TAG_BASE_FRAGMENT)
+            .replace(R.id.container, fragment, fragment.javaClass.simpleName)
             .commit()
     }
 }
