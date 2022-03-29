@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val fragment = if (App.sharedPrefs.getString(PREF_TOKEN, "").isNullOrBlank()) {
-            LoginFragment()
+            // LoginFragment()
+            NavigationFragment()
         } else {
             NavigationFragment()
         }

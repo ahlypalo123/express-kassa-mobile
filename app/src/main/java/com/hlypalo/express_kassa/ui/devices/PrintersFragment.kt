@@ -15,17 +15,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
+import com.hlypalo.express_kassa.data.model.CartDto
+import com.hlypalo.express_kassa.data.model.CartProduct
+import com.hlypalo.express_kassa.data.model.Check
+import com.hlypalo.express_kassa.data.model.PaymentMethod
 import com.hlypalo.express_kassa.ui.base.NavigationFragment
 import com.hlypalo.express_kassa.util.*
 import kotlinx.android.synthetic.main.fragment_printers.*
-import java.nio.ByteBuffer
 import java.util.*
 
 class PrintersFragment : Fragment() {
-
-    companion object {
-        private val applicationUuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
-    }
 
     private lateinit var listAdapter: ArrayAdapter<String>
 
@@ -56,50 +55,39 @@ class PrintersFragment : Fragment() {
     }
 
     private fun printTestCheck() {
-        val address = App.sharedPrefs.getString(PREF_PRINTER_ADDRESS, "")
-        if (address.isNullOrBlank()) {
-            return
-        }
-        val bluetoothManager = context?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val adapter = bluetoothManager.adapter
-        val device = adapter.getRemoteDevice(address)
-        Thread {
-            val socket = device.createRfcommSocketToServiceRecord(applicationUuid)
-            adapter.cancelDiscovery()
-            socket.connect()
-            Log.d(TAG, "device $address successfully connected")
-            val os = socket.outputStream
-            val bill = CheckBuilder.build()
+        val check = Check(
+            id = 0,
+            total = 320f,
+            discount = null,
+            paymentMethod = PaymentMethod.CASH,
+            customerName = null,
+            customerLast4 = null,
+            products = listOf(),
+            date = System.currentTimeMillis(),
+            employeeName = "Andrey"
+        )
 
-            os.write(bill.toByteArray())
-            val gs = 29
-            os.write(intToByteArray(gs).toInt())
-            val h = 104
-            os.write(intToByteArray(h).toInt())
-            val n = 162
-            os.write(intToByteArray(n).toInt())
-
-            val gs_width = 29
-            os.write(intToByteArray(gs_width).toInt())
-            val w = 119
-            os.write(intToByteArray(w).toInt())
-            val n_width = 2
-            os.write(intToByteArray(n_width).toInt())
-
-            socket.close()
-
-        }.start()
-    }
-
-    private fun intToByteArray(value: Int): Byte {
-        val b = ByteBuffer.allocate(4).putInt(value).array()
-        for (k in b.indices) {
-            println(
-                "Selva  [" + k + "] = " + "0x"
-                        + UnicodeFormatter.byteToHex(b[k])
+        val products = listOf(
+            CartDto(
+                count = 1,
+                name = "Капучино",
+                price = 100f
+            ),
+            CartDto(
+                count = 1,
+                name = "Американо",
+                price = 70f
+            ),
+            CartDto(
+                count = 1,
+                name = "Чизкейк",
+                price = 150f
             )
-        }
-        return b[3]
+        )
+
+        val con = CheckPrinter(context).connect()
+        con?.print(check, products)
+        // con?.close()
     }
 
     private fun updateList() {
@@ -124,11 +112,12 @@ class PrintersFragment : Fragment() {
         val devices = bluetoothAdapter.bondedDevices
 
         if (devices.size > 0) {
+            text_empty?.visibility = View.GONE
             for (d in devices) {
                 listAdapter.add("${d.name}\n${d.address}")
             }
         } else {
-            listAdapter.add("None Paired")
+            text_empty?.visibility = View.VISIBLE
         }
     }
 
@@ -147,9 +136,9 @@ class PrintersFragment : Fragment() {
     private fun updateStatus() {
         val last = App.sharedPrefs.getString(PREF_PRINTER_NAME, "")
         if (last.isNullOrBlank()) {
-            text_connected?.text = "No devices connected"
+            text_connected?.text = "Выберите устройство из списка для подключения"
         } else {
-            text_connected?.text = "Last connected device: $last"
+            text_connected?.text = "Подключенное устройство: $last"
         }
     }
 

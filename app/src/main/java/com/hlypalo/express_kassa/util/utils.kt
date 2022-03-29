@@ -55,10 +55,14 @@ class CallBackKt<T> : Callback<T> {
             onResponse?.invoke(response.body())
         } else {
             response.errorBody()?.string()?.let {
-                val json = JsonParser().parse(it).asJsonObject
-                val message = if (json.has("message")) {
-                    json.get("message").asString
-                } else {
+                val message = try {
+                    val json = JsonParser().parse(it).asJsonObject
+                    if (json.has("message")) {
+                        json.get("message").asString
+                    } else {
+                        "Unknown error"
+                    }
+                } catch (ex: Exception) {
                     "Unknown error"
                 }
                 val err = ErrorBody(error = message, message = "")
