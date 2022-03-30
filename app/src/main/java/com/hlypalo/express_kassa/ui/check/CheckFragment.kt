@@ -24,12 +24,15 @@ import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
 import java.nio.ByteBuffer
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadPoolExecutor
 
 class CheckFragment : Fragment() {
 
     private val repo: CheckRepository by lazy { CheckRepository() }
     private val productRepo: ProductRepository by lazy { ProductRepository() }
     private var total: Float = 0.0f
+    private val executor = Executors.newSingleThreadExecutor();
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,7 +84,7 @@ class CheckFragment : Fragment() {
         }
     }
 
-    private fun printCheck(check: Check, products: List<CartDto>) {
+    private fun printCheck(check: Check, products: List<CartDto>) = executor.execute {
         val con = CheckPrinter(context).connect()
         con?.print(check, products)
         // con?.close()

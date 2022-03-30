@@ -69,7 +69,7 @@ interface ApiService {
     companion object {
         var apiService: ApiService? = null
 
-        const val BASE_URL = "https://60ea-95-174-109-197.ngrok.io/"
+        const val BASE_URL = "https://af7b-95-174-109-197.ngrok.io/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {

@@ -12,6 +12,7 @@ import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.AuthenticationRequest
+import com.hlypalo.express_kassa.ui.activity.MainActivity
 import com.hlypalo.express_kassa.ui.base.NavigationFragment
 import com.hlypalo.express_kassa.util.PREF_TOKEN
 import com.hlypalo.express_kassa.util.enqueue
@@ -61,18 +62,14 @@ class LoginFragment : Fragment() {
             val password = input_login_password?.text.toString()
             val dto = AuthenticationRequest(email, password)
             api.login(dto).enqueue {
-                onResponse = {
+                onResponse = { resp ->
                     App.prefEditor
-                        .putString(PREF_TOKEN, it)
+                        .putString(PREF_TOKEN, resp)
                         .commit()
-                    activity?.supportFragmentManager
-                        ?.beginTransaction()
-                        ?.replace(
-                            R.id.container,
-                            NavigationFragment(),
-                            NavigationFragment::class.java.simpleName
-                        )
-                        ?.addToBackStack(null)?.commit()
+                    context?.let {
+                        startActivity(MainActivity.getStartIntent(it))
+                    }
+                    activity?.finish()
                 }
                 onError = {
                     activity?.showError(it)

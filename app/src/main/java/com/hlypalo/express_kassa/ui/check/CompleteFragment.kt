@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.hlypalo.express_kassa.R
+import com.hlypalo.express_kassa.ui.main.MainFragment
 import kotlinx.android.synthetic.main.fragment_complete.*
 
 class CompleteFragment : Fragment() {
@@ -22,7 +23,7 @@ class CompleteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         btn_complete?.setOnClickListener {
             activity?.supportFragmentManager
-                ?.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                ?.popBackStack(MainFragment::class.java.simpleName, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         }
     }
 

@@ -82,7 +82,7 @@ class NavigationFragment : Fragment() {
         activity?.supportFragmentManager
             ?.beginTransaction()
             ?.replace(R.id.content_navigation, fragment)
-            ?.addToBackStack(null)?.commit()
+            ?.addToBackStack(fragment.javaClass.simpleName)?.commit()
     }
 
 }
