@@ -60,6 +60,11 @@ public class CheckPrinterWriter {
         writeImage(bmp);
     }
 
+    public void writeLineBold(String line, Integer gravity) {
+        Bitmap bmp = textToImage(line, gravity, true);
+        writeImage(bmp);
+    }
+
     private void writeImage(Bitmap bmp) {
         byte[] command = decodeBitmap(bmp);
         try {

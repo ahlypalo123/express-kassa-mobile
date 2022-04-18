@@ -6,6 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/MyActionBar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:fitsSystemWindows="true"
+        android:minHeight="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         style="@style/TextAppearance.MaterialComponents.Body1"
         android:id="@+id/text_date"
@@ -13,22 +22,24 @@
         android:layout_width="0dp"
         android:layout_marginTop="16dp"
         android:layout_marginStart="32dp"
-        android:text="@string/date"
-        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        android:text="Дата"
+        android:textStyle="normal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/text_location"/>
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintEnd_toStartOf="@id/text_employee"/>
 
     <TextView
         style="@style/TextAppearance.MaterialComponents.Body1"
-        android:id="@+id/text_location"
+        android:id="@+id/text_employee"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:layout_marginTop="16dp"
-        android:text="@string/location"
-        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        android:text="Работник"
+        android:textStyle="normal"
         app:layout_constraintStart_toEndOf="@id/text_date"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintEnd_toStartOf="@id/text_total"/>
 
     <TextView
@@ -38,10 +49,11 @@
         android:layout_width="0dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
-        android:text="@string/total"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/text_location"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/colorAccent"
+        android:text="Сумма"
+        android:textStyle="normal"
+        app:layout_constraintStart_toEndOf="@id/text_employee"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -51,8 +63,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_location"
-        tools:listitem="@layout/item_check" />
+        app:layout_constraintTop_toBottomOf="@id/text_employee"
+        tools:listitem="@layout/item_check_history" />
 
     <ProgressBar
         android:id="@+id/progress_bar"

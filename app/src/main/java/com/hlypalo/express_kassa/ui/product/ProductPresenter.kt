@@ -22,6 +22,7 @@ class ProductPresenter(private val view: ProductView) : CoroutineScope {
     fun init() {
         repo.fetchProductList {
             onResponse = func@{
+                view.manageEmpty(it.isNullOrEmpty())
                 it ?: return@func
                 list.clear()
                 list.addAll(it)

@@ -9,7 +9,7 @@ import com.hlypalo.express_kassa.data.db.dao.CheckDao
 import com.hlypalo.express_kassa.data.model.CartProduct
 import com.hlypalo.express_kassa.data.model.Check
 
-@Database(entities = [ CartProduct::class, Check::class ], version = 3)
+@Database(entities = [ CartProduct::class, Check::class ], version = 4)
 @TypeConverters(DataConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 

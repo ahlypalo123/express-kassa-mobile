@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:orientation="vertical"
+    android:gravity="top"
     android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/MyActionBar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:fitsSystemWindows="true"
+        android:minHeight="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="invisible"
         android:layout_height="32dp" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -67,11 +81,11 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_check_pay"
+        android:id="@+id/btn_save"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_margin="16dp"
         android:text="Сохранить"
         android:textAllCaps="false" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+</LinearLayout>

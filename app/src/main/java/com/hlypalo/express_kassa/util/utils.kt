@@ -1,5 +1,7 @@
 package com.hlypalo.express_kassa.util
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.SpannableStringBuilder
@@ -26,8 +28,14 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Environment
+import android.widget.NumberPicker
+import android.widget.TextView
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
+import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.hlypalo.express_kassa.data.model.Check
 import org.joda.time.DateTime
 import java.io.File
 import java.io.FileOutputStream
@@ -136,7 +144,7 @@ fun Context?.alert(
 fun Context?.showError(
     error: ErrorBody?,
     onOk: (() -> Unit)? = null
-) = this?.alert(error?.message ?: error?.error, onOk = onOk)
+) = this?.alert(error?.error, onOk = onOk)
 
 fun Context.isNetworkAvailable() =
     (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).run {
@@ -158,4 +166,78 @@ fun Bitmap.compressToFile(context: Context?) : File {
     val fos = FileOutputStream(temp)
     compress(Bitmap.CompressFormat.JPEG, 30, fos)
     return temp
+}
+
+fun Context?.confirm(
+    message: Any?,
+    onYes: (() -> Unit)? = null,
+    onNo: (() -> Unit)? = null,
+    yesText: String? = null,
+    notCancelable: Boolean? = null
+) {
+    if (this == null)
+        return
+    val builder = AlertDialog.Builder(this, R.style.CommonDialog)
+    if (message is Int)
+        builder.setMessage(message)
+    if (message is String?)
+        builder.setMessage(message)
+    builder.setPositiveButton(
+        yesText
+    ) { dialog, _ -> dialog.dismiss(); onYes?.invoke() }
+    if (notCancelable == true) {
+        builder.setCancelable(false)
+    }
+
+    builder.setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss(); onNo?.invoke() }
+    val dialog = builder.create()
+
+    if (notCancelable == true) {
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+    }
+
+    dialog.show()
+}
+
+fun Activity?.isAlive() = this != null && !this.isFinishing
+
+fun Activity?.showCarouselDialog(
+    value: Int,
+    converter: () -> Array<String>,
+    title: String? = null,
+    callback: (Int) -> Unit
+): AlertDialog? {
+    if (!isAlive()) return null
+    val values = converter.invoke()
+    val builder = AlertDialog.Builder(this ?: return null, R.style.ThemeOverlay_AppCompat_Dialog_Alert)
+    @SuppressLint("InflateParams") val view =
+        this.layoutInflater.inflate(R.layout.dialog_carousel, null)
+    if (title != null) {
+        val titleView = view?.findViewById<TextView>(R.id.text_title)
+        titleView?.text = title
+    }
+    val numberPicker = view?.findViewById<NumberPicker>(R.id.np) ?: return null
+    numberPicker.minValue = 0
+    numberPicker.maxValue = values.size - 1
+    numberPicker.displayedValues = values
+    numberPicker.descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
+    numberPicker.value = value
+    builder.setView(view)
+    builder.setPositiveButton("Choose") { d, _ ->
+        callback.invoke(numberPicker.value)
+        d.dismiss()
+    }
+    builder.setNegativeButton(android.R.string.cancel) { d, _ -> d.dismiss() }
+    val dialog = builder.create()
+    dialog.window?.setBackgroundDrawableResource(R.color.white)
+    dialog.setOnShowListener {
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            .setTextColor(ContextCompat.getColor(this, R.color.gray_scorpion))
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            .setTextColor(ContextCompat.getColor(this, R.color.colorAccent))
+    }
+    dialog.show()
+    return dialog
+
 }

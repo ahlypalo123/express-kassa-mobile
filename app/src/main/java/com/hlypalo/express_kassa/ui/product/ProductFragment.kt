@@ -1,9 +1,13 @@
 package com.hlypalo.express_kassa.ui.product
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +40,11 @@ class ProductFragment : Fragment(), ProductView {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_products, container, false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -119,6 +128,10 @@ class ProductFragment : Fragment(), ProductView {
         activity?.showError(err)
     }
 
+    override fun manageEmpty(b: Boolean) {
+        text_empty?.visibility = if (b) View.VISIBLE else View.INVISIBLE
+    }
+
     inner class Adapter(private val items: List<Product>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -135,9 +148,16 @@ class ProductFragment : Fragment(), ProductView {
             fun bind(item: Product) = with(itemView) {
                 text_product_name?.text = item.name
                 text_product_price?.text = item.price.toString()
-                if (!item.photoUrl.isNullOrBlank()) {
+                if (item.photoUrl.isNullOrBlank()) {
+                    val tv = TextView(context)
+                    tv.text = item.name[0].toString()
+                    tv.setTextColor(ContextCompat.getColor(context, R.color.white))
+                    tv.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
+                    val bmp = getBitmapFromView(tv)
+                    image_product?.setImageBitmap(bmp)
+                } else {
                     image_product?.loadImageUrl(
-                        ApiService.BASE_URL + item.photoUrl,
+                        item.photoUrl,
                         R.drawable.image
                     )
                 }
@@ -148,6 +168,14 @@ class ProductFragment : Fragment(), ProductView {
                 } else {
                     setOnCreateContextMenuListener(this@ViewHolder)
                 }
+            }
+
+            private fun getBitmapFromView(view: View): Bitmap? {
+                val bitmap =
+                    Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(bitmap)
+                view.draw(canvas)
+                return bitmap
             }
 
             override fun onCreateContextMenu(

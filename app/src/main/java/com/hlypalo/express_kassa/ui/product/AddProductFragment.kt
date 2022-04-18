@@ -46,6 +46,16 @@ class AddProductFragment : Fragment() {
         }
     }
 
+    private val requestCameraPermissionsBarcode = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            val intent = Intent(activity, SimpleScannerActivity::class.java)
+            requestBarCode.launch(intent)
+        }
+    }
+
+
     private val requestStorePermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -124,8 +134,7 @@ class AddProductFragment : Fragment() {
         input_product_barcode?.setOnFocusChangeListener { _, b ->
             if (b) {
                 input_product_barcode?.clearFocus()
-                val intent = Intent(activity, SimpleScannerActivity::class.java)
-                requestBarCode.launch(intent)
+                requestCameraPermissionsBarcode.launch(Manifest.permission.CAMERA)
             }
         }
 

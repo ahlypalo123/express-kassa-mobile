@@ -2,8 +2,10 @@ package com.hlypalo.express_kassa.ui.shift
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isEmpty
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.App
@@ -11,9 +13,12 @@ import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.ShiftDetails
 import com.hlypalo.express_kassa.data.model.ShiftRequest
+import com.hlypalo.express_kassa.ui.base.NavigationFragment
 import com.hlypalo.express_kassa.util.PREF_EMPLOYEE_NAME
 import com.hlypalo.express_kassa.util.enqueue
+import kotlinx.android.synthetic.main.fragment_printers.*
 import kotlinx.android.synthetic.main.fragment_shift.*
+import kotlinx.android.synthetic.main.fragment_shift.toolbar
 
 class ShiftFragment : Fragment() {
 
@@ -31,6 +36,13 @@ class ShiftFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val activity = activity as AppCompatActivity?
+        activity?.setSupportActionBar(toolbar)
+        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
+        activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
+        setHasOptionsMenu(true)
+
         api.getCurrentShift().enqueue {
             onResponse = {
                 it?.let {
@@ -44,6 +56,18 @@ class ShiftFragment : Fragment() {
                 updateUi()
             }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                val fragment = activity?.supportFragmentManager
+                    ?.findFragmentByTag(NavigationFragment::class.java.simpleName)
+                (fragment as? NavigationFragment)?.openDrawer()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun validateEmployeeName() : Boolean {

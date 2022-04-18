@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 import java.io.Serializable
 
 @JsonClass(generateAdapter = true)
-data class Product (
+data class Product(
     var id: Long,
     val name: String,
     val price: Float,
@@ -15,13 +15,13 @@ data class Product (
 ) : Serializable
 
 @Entity
-data class CartProduct (
+data class CartProduct(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val name: String,
     val price: Float
 )
 
-data class ShiftDetails (
+data class ShiftDetails(
     val id: Long,
     val employeeName: String,
     val startDate: Long,
@@ -30,7 +30,7 @@ data class ShiftDetails (
 
 @Entity
 @JsonClass(generateAdapter = true)
-data class Check (
+data class Check(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val total: Float,
     val discount: Float?,
@@ -39,5 +39,19 @@ data class Check (
     val customerLast4: Int?,
     val products: List<CartProduct>,
     val date: Long,
-    val employeeName: String
+
+    val inn: String? = null,
+    val employeeName: String? = null,
+    val address: String? = null,
+    val name: String? = null,
+    val taxType: String? = null,
+) : Serializable
+
+@JsonClass(generateAdapter = true)
+data class MerchantDetails(
+    val id: Long,
+    val inn: String?,
+    val address: String?,
+    val name: String?,
+    val taxType: String?,
 )

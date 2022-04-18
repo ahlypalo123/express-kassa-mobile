@@ -1,38 +1,32 @@
 package com.hlypalo.express_kassa.ui.check
 
-import android.bluetooth.BluetoothManager
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.model.CartDto
+import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.Check
 import com.hlypalo.express_kassa.data.model.PaymentMethod
 import com.hlypalo.express_kassa.data.repository.CheckRepository
 import com.hlypalo.express_kassa.data.repository.ProductRepository
-import com.hlypalo.express_kassa.util.*
+import com.hlypalo.express_kassa.util.CheckPrinterUtil
+import com.hlypalo.express_kassa.util.PREF_EMPLOYEE_NAME
+import com.hlypalo.express_kassa.util.calculateTotal
 import kotlinx.android.synthetic.main.fragment_check.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.joda.time.DateTime
-import java.nio.ByteBuffer
-import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.ThreadPoolExecutor
 
 class CheckFragment : Fragment() {
 
     private val repo: CheckRepository by lazy { CheckRepository() }
+    private val api: ApiService by lazy { ApiService.getInstance() }
     private val productRepo: ProductRepository by lazy { ProductRepository() }
     private var total: Float = 0.0f
-    private val executor = Executors.newSingleThreadExecutor();
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,24 +67,19 @@ class CheckFragment : Fragment() {
             employeeName = App.sharedPrefs.getString(PREF_EMPLOYEE_NAME, "") ?: ""
         )
         val products = productRepo.getProductsFromCartGrouped()
-        repo.saveCheck(req)
+        val check = repo.saveCheck(req) ?: return@launch
         productRepo.deleteProductsFromCart()
         withContext(Dispatchers.Main) {
-            printCheck(req, products)
+            CheckPrinterUtil.printCheck(
+                check = check,
+                products = products,
+                view = view,
+                context = context
+            )
             activity?.supportFragmentManager
                 ?.beginTransaction()
                 ?.replace(R.id.content_navigation, CompleteFragment())
                 ?.addToBackStack(null)?.commit()
         }
-    }
-
-    private fun printCheck(check: Check, products: List<CartDto>) = executor.execute {
-        val con = CheckPrinter(context).connect()
-        con?.print(check, products)
-        // con?.close()
-    }
-
-    private fun buildCheck(check: Check) : String {
-        return ""
     }
 }

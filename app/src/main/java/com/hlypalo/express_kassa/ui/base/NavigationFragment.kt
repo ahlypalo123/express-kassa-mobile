@@ -13,6 +13,7 @@ import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.ui.check.CheckHistoryFragment
 import com.hlypalo.express_kassa.ui.devices.PrintersFragment
 import com.hlypalo.express_kassa.ui.main.MainFragment
+import com.hlypalo.express_kassa.ui.merchant.MerchantDetailsFragment
 import com.hlypalo.express_kassa.ui.product.ProductFragment
 import com.hlypalo.express_kassa.ui.shift.ShiftFragment
 import com.hlypalo.express_kassa.util.PREF_TOKEN
@@ -34,7 +35,6 @@ class NavigationFragment : Fragment() {
         pushFragment(MainFragment())
 
         navigation?.setNavigationItemSelectedListener func@{ item ->
-            Toast.makeText(context, "You've selected $item", Toast.LENGTH_LONG).show()
             when (item.itemId) {
                 R.id.navigation_products -> {
                     ProductFragment()
@@ -54,6 +54,9 @@ class NavigationFragment : Fragment() {
                 }
                 R.id.navigation_devices -> {
                     PrintersFragment()
+                }
+                R.id.navigation_settings -> {
+                    MerchantDetailsFragment()
                 }
                 else -> {
                     MainFragment()
@@ -82,7 +85,7 @@ class NavigationFragment : Fragment() {
         activity?.supportFragmentManager
             ?.beginTransaction()
             ?.replace(R.id.content_navigation, fragment)
-            ?.addToBackStack(fragment.javaClass.simpleName)?.commit()
+            ?.commit()
     }
 
 }

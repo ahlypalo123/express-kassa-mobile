@@ -22,3 +22,7 @@ data class ShiftRequest(
 enum class PaymentMethod {
     CASH, CARD
 }
+
+enum class OrderColumn {
+    EMPLOYEE_NAME, TOTAL, DATE
+}

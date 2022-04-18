@@ -52,10 +52,10 @@ interface ApiService {
     fun closeShift() : Call<Unit>
 
     @POST("/check")
-    fun saveCheckAsync(@Body data: Check) : Deferred<Response<Unit>>
+    fun saveCheckAsync(@Body data: Check) : Deferred<Response<Check>>
 
     @GET("/check")
-    fun getCheckHistoryAsync() : Deferred<Response<List<Check>>>
+    fun getCheckHistoryAsync(@Query("orderColumn") col: OrderColumn) : Deferred<Response<List<Check>>>
 
     @POST("/auth/forgot-password")
     fun forgotPassword(@Body req: AuthenticationRequest) : Call<Unit>
@@ -66,10 +66,19 @@ interface ApiService {
     @PUT("/merchant/update-password")
     fun updatePassword(@Body req: AuthenticationRequest) : Call<Unit>
 
+    @PUT("/merchant")
+    fun updateMerchantDetails(@Body req: MerchantDetails) : Call<Unit>
+
+    @GET("/merchant")
+    fun getMerchantDetails() : Call<MerchantDetails>
+
+    @GET("/merchant")
+    fun getMerchantDetailsAsync() : Deferred<Response<MerchantDetails?>>
+
     companion object {
         var apiService: ApiService? = null
 
-        const val BASE_URL = "https://af7b-95-174-109-197.ngrok.io/"
+        private const val BASE_URL = "https://express-kassa.herokuapp.com/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {

@@ -9,10 +9,6 @@
         android:title="Продукты"
         android:checked="true" />
     <item
-        android:id="@+id/navigation_log_out"
-        android:title="Выйти"
-        android:checked="true" />
-    <item
         android:id="@+id/navigation_shift"
         android:title="Смена"
         android:checked="true" />
@@ -23,5 +19,13 @@
     <item
         android:id="@+id/navigation_devices"
         android:title="Устройства"
+        android:checked="true" />
+    <item
+        android:id="@+id/navigation_settings"
+        android:title="Настройки"
+        android:checked="true" />
+    <item
+        android:id="@+id/navigation_log_out"
+        android:title="Выйти"
         android:checked="true" />
 </menu>

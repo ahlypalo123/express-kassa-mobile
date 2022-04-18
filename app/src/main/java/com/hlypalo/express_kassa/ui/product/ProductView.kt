@@ -8,4 +8,6 @@ interface ProductView {
 
     fun showError(err: ErrorBody?)
 
+    fun manageEmpty(b: Boolean)
+
 }

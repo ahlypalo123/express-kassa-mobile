@@ -1,11 +1,14 @@
 package com.hlypalo.express_kassa.ui.product
 
+import android.Manifest
+import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.R
@@ -26,6 +29,15 @@ class BarCodeFragment : Fragment(), ZBarScannerView.ResultHandler {
 
     private val repo: ProductRepository by lazy { ProductRepository() }
     private val list: MutableList<Product> by lazy { mutableListOf() }
+
+    private val requestCameraPermissions = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            scanner_view?.setResultHandler(this)
+            scanner_view?.startCamera()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,8 +76,7 @@ class BarCodeFragment : Fragment(), ZBarScannerView.ResultHandler {
 
     override fun onResume() {
         super.onResume()
-        scanner_view?.setResultHandler(this)
-        scanner_view?.startCamera()
+        requestCameraPermissions.launch(Manifest.permission.CAMERA)
     }
 
     override fun handleResult(rawResult: Result?) {

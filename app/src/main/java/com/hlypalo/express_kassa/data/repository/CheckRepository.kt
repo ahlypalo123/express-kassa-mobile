@@ -4,6 +4,7 @@ import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.db.dao.CheckDao
 import com.hlypalo.express_kassa.data.model.Check
+import com.hlypalo.express_kassa.data.model.OrderColumn
 import com.hlypalo.express_kassa.util.PREF_LAST_CHECK_SAVED_DATE
 
 // stores check records to the local database
@@ -15,14 +16,18 @@ class CheckRepository {
     private val dao: CheckDao by lazy { App.db.checkDao() }
     private val api: ApiService by lazy { ApiService.getInstance() }
 
-    suspend fun saveCheck(data: Check) {
-        dao.insert(data)
-        api.saveCheckAsync(data).await()
-        App.prefEditor.putLong(PREF_LAST_CHECK_SAVED_DATE, System.currentTimeMillis())
+    suspend fun saveCheck(data: Check) : Check? {
+        // dao.insert(data)
+        val resp = api.saveCheckAsync(data).await()
+        if (resp.isSuccessful) {
+            App.prefEditor.putLong(PREF_LAST_CHECK_SAVED_DATE, System.currentTimeMillis())
+        }
+        return resp.body()
     }
 
-    suspend fun getCheckHistory() : List<Check> {
-        return dao.getAll()
+    suspend fun getCheckHistory(orderColumn: OrderColumn) : List<Check>? {
+        // return dao.getAll()
+        return api.getCheckHistoryAsync(orderColumn).await().body()
     }
 
     suspend fun sync() {
@@ -34,7 +39,7 @@ class CheckRepository {
             api.saveCheckAsync(it).await()
         }
         dao.deleteAll()
-        val resp = api.getCheckHistoryAsync().await()
+        val resp = api.getCheckHistoryAsync(OrderColumn.DATE).await()
         if (resp.isSuccessful) {
             resp.body()?.forEach {
                 dao.insert(it)
