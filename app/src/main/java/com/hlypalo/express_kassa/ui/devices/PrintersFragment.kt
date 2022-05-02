@@ -17,17 +17,22 @@ import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.*
+import com.hlypalo.express_kassa.data.repository.ProductRepository
 import com.hlypalo.express_kassa.ui.base.NavigationFragment
+import com.hlypalo.express_kassa.ui.check.CompleteFragment
 import com.hlypalo.express_kassa.util.*
 import kotlinx.android.synthetic.main.fragment_printers.*
 import kotlinx.android.synthetic.main.fragmet_add_product.*
 import java.util.*
 import java.util.concurrent.Executors
 
-class PrintersFragment : Fragment() {
+class PrintersFragment(
+    private var forResult: Boolean = false
+) : Fragment() {
 
     private lateinit var listAdapter: ArrayAdapter<String>
     private lateinit var bluetoothAdapter: BluetoothAdapter
+    private val executor = Executors.newSingleThreadExecutor()
 
     private val requestEnableBluetooth = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -37,11 +42,19 @@ class PrintersFragment : Fragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("forResult", forResult)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        savedInstanceState?.getBoolean("forResult")?.let {
+            forResult = it
+        }
         return inflater.inflate(R.layout.fragment_printers, container, false)
     }
 
@@ -50,9 +63,11 @@ class PrintersFragment : Fragment() {
 
         val activity = activity as AppCompatActivity?
         activity?.setSupportActionBar(toolbar)
-        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        if (!forResult) {
+            activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
+            activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        }
         activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
-        activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
         setHasOptionsMenu(true)
 
         val bluetoothManager = context?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -83,7 +98,7 @@ class PrintersFragment : Fragment() {
         updateStatus()
 
         btn_test?.setOnClickListener {
-            printTestCheck()
+            print()
         }
     }
 
@@ -91,38 +106,51 @@ class PrintersFragment : Fragment() {
         inflater.inflate(R.menu.menu_devices, menu)
     }
 
-    private fun printTestCheck() {
+    private fun print() {
+        if (forResult) {
+            activity?.supportFragmentManager?.popBackStack()
+            return
+        }
+        executor.execute {
+            try {
+                CheckPrinterUtil.printCheck(getTestCheck(), view, context)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                view?.post {
+                    activity?.confirm("Не удалось установить соединение с принтером")
+                }
+            }
+        }
+    }
+
+    private fun getTestCheck() : Check {
         val check = Check(
             id = 0,
             total = 320f,
-            discount = null,
-            paymentMethod = PaymentMethod.CASH,
-            customerName = null,
-            customerLast4 = null,
-            products = listOf(),
+            paymentMethod = PaymentMethod.CARD,
             date = System.currentTimeMillis(),
             employeeName = "Andrey"
         )
 
         val products = listOf(
-            CartDto(
+            CheckProduct(
                 count = 1,
                 name = "Капучино",
                 price = 100f
             ),
-            CartDto(
+            CheckProduct(
                 count = 1,
                 name = "Американо",
                 price = 70f
             ),
-            CartDto(
+            CheckProduct(
                 count = 1,
                 name = "Чизкейк",
                 price = 150f
             )
         )
-
-        CheckPrinterUtil.printCheck(check, products, view, context)
+        check.products.addAll(products)
+        return check
     }
 
     private fun updateList() {

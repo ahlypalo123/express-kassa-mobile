@@ -11,12 +11,17 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CheckPrinterWriter {
+public class CheckPrinterWriter implements Closeable {
 
     private static final String hexStr = "0123456789ABCDEF";
     private static final String[] binaryArray = { "0000", "0001", "0010", "0011",
@@ -26,12 +31,10 @@ public class CheckPrinterWriter {
     public static byte[] FEED_LINE = {10};
     public static final byte[] ESC_ALIGN_CENTER = new byte[] { 0x1b, 'a', 0x01 };
 
-    private final Context context;
     private final OutputStream os;
     private boolean first = true;
 
     public CheckPrinterWriter(Context context, OutputStream os) {
-        this.context = context;
         this.os = os;
     }
 
@@ -43,104 +46,56 @@ public class CheckPrinterWriter {
         }
     }
 
-    public void writeLine(String right, String left) {
-        Bitmap bmp1 = textToImage(right, Gravity.START);
-        Bitmap bmp2 = textToImage(left, Gravity.END);
-        writeImage(overlay(bmp1, bmp2));
+    @Override
+    public void close() throws IOException {
+        os.close();
     }
 
-    public void writeLineBold(String right, String left) {
-        Bitmap bmp1 = textToImage(right, Gravity.START, true);
-        Bitmap bmp2 = textToImage(left, Gravity.END, true);
-        writeImage(overlay(bmp1, bmp2));
-    }
-
-    public void writeLine(String line, Integer gravity) {
-        Bitmap bmp = textToImage(line, gravity);
-        writeImage(bmp);
-    }
-
-    public void writeLineBold(String line, Integer gravity) {
-        Bitmap bmp = textToImage(line, gravity, true);
-        writeImage(bmp);
-    }
-
-    private void writeImage(Bitmap bmp) {
-        byte[] command = decodeBitmap(bmp);
-        try {
-            if (first) {
-                os.write(ESC_ALIGN_CENTER);
-                first = false;
+    private Bitmap[] splitBitmap(Bitmap src) {
+        final int maxSize = 0xff;
+        int parts = (int) Math.ceil((float) src.getHeight() / maxSize);
+        Bitmap[] res = new Bitmap[parts];
+        for (int i = 0; i < parts; i++) {
+            int start;
+            if (i == 0) {
+                start = 0;
+            } else {
+                start = i * maxSize + 1;
             }
-            os.write(command);
-        } catch (Exception e) {
-            Log.e("PrintTools", "error occurred while reading line", e);
+            int height = Math.min(maxSize, src.getHeight() - start);
+            System.out.println("src.height = " + src.getHeight() + " start = " + start + " height = " + height);
+            res[i] = Bitmap.createBitmap(src, 0, start, src.getWidth(), height);
         }
+        return res;
     }
 
-    private Bitmap textToImage(String text, Integer gravity) {
-        return textToImage(text, gravity, false);
-    }
-
-    private Bitmap textToImage(String text, Integer gravity, boolean bold) {
-        TextView textView = new TextView(context);
-        textView.setText(text);
-        textView.setDrawingCacheEnabled(true);
-        textView.setGravity(gravity);
-        if (bold) {
-            textView.setTypeface(null, Typeface.BOLD);
-        }
-        textView.buildDrawingCache();
-        textView.measure(View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        textView.layout(0, 0, textView.getMeasuredWidth(), textView.getMeasuredHeight());
-        return textView.getDrawingCache();
-    }
-
-    private static Bitmap overlay(Bitmap src, Bitmap dst) {
-        final int width = src.getWidth();
-        final int height = src.getHeight();
-        final int size = width * height;
-
-        int[] pixSrc = new int[size];
-        src.getPixels(pixSrc, 0, width, 0, 0, width, height);
-
-        int[] pixDst = new int[size];
-        dst.getPixels(pixDst, 0, width, 0, 0, width, height);
-
-        int[] pixOverlay = new int[size];
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int index = y * width + x;
-
-                if (pixSrc[index] != 0) {
-                    pixOverlay[index] = pixSrc[index];
+    public void writeImage(Bitmap bmp) {
+        Bitmap[] parts = splitBitmap(bmp);
+        for (Bitmap p : parts) {
+            byte[] command = decodeBitmap(p);
+            try {
+                if (first) {
+                    os.write(ESC_ALIGN_CENTER);
+                    first = false;
                 }
-                if (pixDst[index] != 0) {
-                    pixOverlay[index] = pixDst[index];
-                }
-
+                os.write(command);
+            } catch (Exception e) {
+                Log.e("PrintTools", "error occurred while reading line", e);
             }
         }
-        return Bitmap.createBitmap(pixOverlay, width, height,
-                Bitmap.Config.ARGB_4444);
     }
 
     private byte[] decodeBitmap(Bitmap bmp){
         int bmpWidth = bmp.getWidth();
         int bmpHeight = bmp.getHeight();
 
-        List<String> list = new ArrayList<String>(); //binaryString list
+        List<String> list = new ArrayList<>(); //binaryString list
         StringBuffer sb;
 
-
-        int bitLen = bmpWidth / 8;
         int zeroCount = bmpWidth % 8;
 
         String zeroStr = "";
         if (zeroCount > 0) {
-            bitLen = bmpWidth / 8 + 1;
             for (int i = 0; i < (8 - zeroCount); i++) {
                 zeroStr = zeroStr + "0";
             }
@@ -151,7 +106,7 @@ public class CheckPrinterWriter {
             for (int j = 0; j < bmpWidth; j++) {
                 int color = bmp.getPixel(j, i);
 
-                if (color == 0)
+                if (Math.abs(color) < 100)
                     sb.append("0");
                 else
                     sb.append("1");
@@ -163,7 +118,7 @@ public class CheckPrinterWriter {
         }
 
         List<String> bmpHexList = binaryListToHexStringList(list);
-        String commandHexString = "1D763000";
+        final String commandHexString = "1D763000";
         String widthHexString = Integer
                 .toHexString(bmpWidth % 8 == 0 ? bmpWidth / 8
                         : (bmpWidth / 8 + 1));
@@ -184,7 +139,7 @@ public class CheckPrinterWriter {
         }
         heightHexString = heightHexString + "00";
 
-        List<String> commandList = new ArrayList<String>();
+        List<String> commandList = new ArrayList<>();
         commandList.add(commandHexString+widthHexString+heightHexString);
         commandList.addAll(bmpHexList);
 

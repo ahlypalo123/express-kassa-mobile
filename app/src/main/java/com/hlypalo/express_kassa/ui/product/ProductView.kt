@@ -10,4 +10,8 @@ interface ProductView {
 
     fun manageEmpty(b: Boolean)
 
+    fun showProgress()
+
+    fun hideProgress()
+
 }

@@ -14,10 +14,11 @@ data class Product(
     val barCode: String?
 ) : Serializable
 
-@Entity
-data class CartProduct(
-    @PrimaryKey(autoGenerate = true) val id: Long,
-    val name: String,
+data class CheckProduct(
+    val id: Long? = null,
+    val name: String? = null,
+    var count: Int,
+    val productId: Long? = null,
     val price: Float
 )
 
@@ -31,20 +32,21 @@ data class ShiftDetails(
 @Entity
 @JsonClass(generateAdapter = true)
 data class Check(
-    @PrimaryKey(autoGenerate = true) val id: Long,
-    val total: Float,
-    val discount: Float?,
-    val paymentMethod: PaymentMethod,
-    val customerName: String?,
-    val customerLast4: Int?,
-    val products: List<CartProduct>,
-    val date: Long,
-
-    val inn: String? = null,
-    val employeeName: String? = null,
-    val address: String? = null,
-    val name: String? = null,
-    val taxType: String? = null,
+    @PrimaryKey(autoGenerate = true) val id: Long? = null,
+    var total: Float? = null,
+    var discount: Float? = null,
+    var paymentMethod: PaymentMethod? = null,
+    var cash: Float? = null,
+    var change: Float? = null,
+    var customerName: String? = null,
+    var customerLast4: Int? = null,
+    var products: MutableList<CheckProduct> = mutableListOf(),
+    var date: Long? = null,
+    var inn: String? = null,
+    var employeeName: String? = null,
+    var address: String? = null,
+    var name: String? = null,
+    var taxType: String? = null,
 ) : Serializable
 
 @JsonClass(generateAdapter = true)
@@ -54,4 +56,5 @@ data class MerchantDetails(
     val address: String?,
     val name: String?,
     val taxType: String?,
+    val shift: ShiftDetails? = null
 )

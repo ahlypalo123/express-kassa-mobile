@@ -1,28 +1,20 @@
 package com.hlypalo.express_kassa.data.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.content.SharedPreferences
+import com.google.gson.Gson
 import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.data.api.ApiService
-import com.hlypalo.express_kassa.data.model.CartDto
-import com.hlypalo.express_kassa.data.model.CartProduct
+import com.hlypalo.express_kassa.data.model.Check
+import com.hlypalo.express_kassa.data.model.CheckProduct
 import com.hlypalo.express_kassa.data.model.Product
-import com.hlypalo.express_kassa.util.CallBackKt
-import com.hlypalo.express_kassa.util.enqueue
+import com.hlypalo.express_kassa.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.HttpException
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
 
 
 class ProductRepository : CoroutineScope {
@@ -49,31 +41,54 @@ class ProductRepository : CoroutineScope {
         return null
     }
 
-    suspend fun addProductToCart(data: CartProduct) {
-        App.db.cartDao().add(data)
-    }
-
     fun deleteProduct(id: Long, callback: CallBackKt<Unit>.() -> Unit) {
         api.deleteProduct(id).enqueue(callback)
     }
 
-    suspend fun getProductsFromCartGrouped() : List<CartDto> {
-        return App.db.cartDao().getAllGrouped()
+    fun addProductToCheck(product: Product) {
+        val check = getCheck()
+        var cp = check?.products?.find {
+            it.name == product.name
+        }
+        if (cp != null) {
+            cp.count++
+        } else {
+            cp = CheckProduct(
+                name = product.name,
+                count = 1,
+                productId = product.id,
+                price = product.price
+            )
+            check?.products?.add(cp)
+        }
+        check?.total = (check?.total ?: 0F) + product.price
+        updateCheck(check)
     }
 
-    suspend fun deleteProductsFromCart() {
-        App.db.cartDao().deleteAll()
+    fun updateCheck(check: Check?) {
+        App.prefEditor.putString(PREF_CHECK, Gson().toJson(check)).commit()
     }
 
-    fun getProductsFromCartLiveData() : LiveData<List<CartDto>> {
-        return App.db.cartDao().getAllGroupedLiveData()
+    fun getCheck() : Check? {
+        val check = App.sharedPrefs.getString(PREF_CHECK, "")
+        if (check.isNullOrBlank()) {
+            return null
+        }
+        return Gson().fromJson(check, Check::class.java)
     }
 
-    suspend fun getProductsFromCart() : List<CartProduct> {
-        return App.db.cartDao().getAll()
+    private var listener: SharedPreferences.OnSharedPreferenceChangeListener? = null
+
+    fun subscribeOnCheck(callback: (Check?) -> Unit) {
+        listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == PREF_CHECK) {
+                callback(getCheck())
+            }
+        }
+        App.sharedPrefs.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    suspend fun deleteProductFromCartByName(name: String) {
-        App.db.cartDao().deleteByName(name)
+    fun unsubscribeFromCheck() {
+        App.sharedPrefs.unregisterOnSharedPreferenceChangeListener(listener)
     }
 }

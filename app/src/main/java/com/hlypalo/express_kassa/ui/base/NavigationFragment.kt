@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import com.github.amlcurran.showcaseview.ShowcaseView
+import com.github.amlcurran.showcaseview.targets.ViewTarget
 import com.hlypalo.express_kassa.App
-import com.hlypalo.express_kassa.ui.activity.MainActivity
 import com.hlypalo.express_kassa.R
+import com.hlypalo.express_kassa.data.api.ApiService
+import com.hlypalo.express_kassa.ui.activity.MainActivity
 import com.hlypalo.express_kassa.ui.check.CheckHistoryFragment
 import com.hlypalo.express_kassa.ui.devices.PrintersFragment
 import com.hlypalo.express_kassa.ui.main.MainFragment
@@ -17,9 +19,15 @@ import com.hlypalo.express_kassa.ui.merchant.MerchantDetailsFragment
 import com.hlypalo.express_kassa.ui.product.ProductFragment
 import com.hlypalo.express_kassa.ui.shift.ShiftFragment
 import com.hlypalo.express_kassa.util.PREF_TOKEN
+import com.hlypalo.express_kassa.util.PREF_TUTORIAL_VIEWED
+import com.hlypalo.express_kassa.util.enqueue
 import kotlinx.android.synthetic.main.fragment_navigation.*
+import kotlinx.android.synthetic.main.layout_drawer_header.*
 
 class NavigationFragment : Fragment() {
+
+    private val api: ApiService by lazy { ApiService.getInstance() }
+    private var showcaseView: ShowcaseView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,9 +38,13 @@ class NavigationFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-
+        setupHeader()
         pushFragment(MainFragment())
+
+        if (!App.sharedPrefs.getBoolean(PREF_TUTORIAL_VIEWED, false)) {
+            App.prefEditor.putBoolean(PREF_TUTORIAL_VIEWED, true).commit()
+            showTutorial()
+        }
 
         navigation?.setNavigationItemSelectedListener func@{ item ->
             when (item.itemId) {
@@ -69,7 +81,33 @@ class NavigationFragment : Fragment() {
         }
     }
 
+    private fun showTutorial() {
+        showcaseView = ShowcaseView.Builder(activity)
+            .setTarget(ViewTarget(R.id.placeholder, activity))
+            .setContentText("Формируйте список товаров, открывайте смену, добавляйте информацию о магазине в боковом меню")
+            .hideOnTouchOutside()
+            .setStyle(R.style.ShowcaseCustomTheme)
+            .build().apply {
+                hideButton()
+            }
+    }
+
+    private fun setupHeader() = with(navigation.getHeaderView(0)) {
+        api.getMerchantDetails().enqueue {
+            onResponse = func@{
+                it ?: return@func
+                text_name?.text = it.name
+                text_address?.text = it.address
+                text_employee?.text = "Работник: ${it.shift?.employeeName}"
+                text_name?.visibility = if (it.name.isNullOrBlank()) View.GONE else View.VISIBLE
+                text_address?.visibility = if (it.address.isNullOrBlank()) View.GONE else View.VISIBLE
+                text_employee?.visibility = if (it.shift?.employeeName.isNullOrBlank()) View.GONE else View.VISIBLE
+            }
+        }
+    }
+
     fun openDrawer() {
+        showcaseView?.hide()
         layout_navigation?.openDrawer(GravityCompat.START)
     }
 
@@ -82,10 +120,10 @@ class NavigationFragment : Fragment() {
     }
 
     private fun pushFragment(fragment: Fragment) {
-        activity?.supportFragmentManager
-            ?.beginTransaction()
-            ?.replace(R.id.content_navigation, fragment)
-            ?.commit()
+        childFragmentManager
+            .beginTransaction()
+            .replace(R.id.content_navigation, fragment)
+            .commit()
     }
 
 }

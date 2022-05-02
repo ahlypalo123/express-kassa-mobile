@@ -1,74 +1,75 @@
 package com.hlypalo.express_kassa.ui.check
 
+import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.ContextMenu
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.model.CartDto
 import com.hlypalo.express_kassa.data.model.Check
-import com.hlypalo.express_kassa.util.inflate
-import kotlinx.android.synthetic.main.item_cart.view.*
+import com.hlypalo.express_kassa.data.model.CheckProduct
+import com.hlypalo.express_kassa.data.model.PaymentMethod
+import com.hlypalo.express_kassa.ui.base.NavigationFragment
+import com.hlypalo.express_kassa.util.*
+import kotlinx.android.synthetic.main.fragment_check.*
+import kotlinx.android.synthetic.main.fragment_check_details.*
+import kotlinx.android.synthetic.main.fragment_check_details.image_check
+import kotlinx.android.synthetic.main.fragment_check_details.toolbar
+import kotlinx.android.synthetic.main.fragment_check_history.*
+import org.joda.time.DateTime
 
 class CheckDetailsFragment(private var check: Check) : Fragment() {
 
-    companion object {
-        private const val ARG_CHECK = "check"
-    }
+    private lateinit var bitmap: Bitmap
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (savedInstanceState?.getSerializable(ARG_CHECK) as? Check)?.let {
+        val activity = activity as AppCompatActivity?
+        activity?.setSupportActionBar(toolbar)
+        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_keyboard_arrow_left_24)
+        activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
+        setHasOptionsMenu(true)
+
+        (savedInstanceState?.getSerializable("check") as? Check)?.let {
             check = it
         }
         return inflater.inflate(R.layout.fragment_check_details, container, false)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(ARG_CHECK, check)
+        outState.putSerializable("check", check)
         super.onSaveInstanceState(outState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
+        bitmap = CheckBuilder.build(check, context)
+        image_check?.setImageBitmap(bitmap)
+        btn_print?.setOnClickListener {
+            CheckPrinterUtil.printCheck(check, view, context)
+        }
     }
 
-    inner class Adapter(private val items: List<CartDto>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+    private fun home() {
+        activity?.supportFragmentManager?.popBackStack()
+    }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            return ViewHolder(parent.inflate(R.layout.item_cart))
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(items[position])
-        }
-
-        override fun getItemCount(): Int = items.size
-
-        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
-            fun bind(item: CartDto) = with(itemView) {
-                text_cart_name?.text = item.name
-                text_cart_price?.text = (item.price * item.count).toString()
-                text_cart_count?.text = item.count.toString()
-                setOnCreateContextMenuListener(this@ViewHolder)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                home()
+                return true
             }
-
-            override fun onCreateContextMenu(
-                menu: ContextMenu?,
-                v: View?,
-                menuInfo: ContextMenu.ContextMenuInfo?
-            ) {
-                v?.id?.let {
-                    menu?.add(this.adapterPosition, it, 0, R.string.delete)
-                }
+            R.id.share -> {
+                requireContext().getShareIntent(bitmap.compressReceiptToFile(context))
             }
         }
+        return super.onOptionsItemSelected(item)
     }
 
 }

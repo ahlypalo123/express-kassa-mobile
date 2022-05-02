@@ -1,7 +1,6 @@
 package com.hlypalo.express_kassa.ui.product
 
 import android.Manifest
-import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.model.CartProduct
 import com.hlypalo.express_kassa.data.model.Product
 import com.hlypalo.express_kassa.data.repository.ProductRepository
 import com.hlypalo.express_kassa.ui.base.NavigationFragment
@@ -83,7 +81,7 @@ class BarCodeFragment : Fragment(), ZBarScannerView.ResultHandler {
         MediaPlayer.create(context, R.raw.beep).start()
         CoroutineScope(Dispatchers.IO).launch {
             list.firstOrNull { p -> p.barCode == rawResult?.contents }?.let { p ->
-                repo.addProductToCart(CartProduct(0, p.name, p.price))
+                repo.addProductToCheck(p)
             }
         }
         view?.postDelayed({

@@ -52,7 +52,31 @@ class RegisterFragment : Fragment() {
         }
     }
 
+    private fun validate() : Boolean {
+        if (input_register_email?.text.isNullOrBlank()) {
+            layout_register_email?.error = "Это поле не может быть пустым"
+            return false
+        }
+        if (input_register_password?.text.isNullOrBlank()) {
+            layout_register_password?.error = "Это поле не может быть пустым"
+            return false
+        }
+        if (input_register_password_confirmation?.text.isNullOrBlank()) {
+            input_register_password_confirmation?.error = "Это поле не может быть пустым"
+            return false
+        }
+        if (input_register_password_confirmation?.text != input_register_password?.text) {
+            input_register_password_confirmation?.error = "Значение не соответствует полю 'Пароль'"
+            return false
+        }
+        return true
+    }
+
     private fun register() {
+        if (!validate()) {
+            return
+        }
+
         val email = input_register_email?.text.toString()
         val password = input_register_password?.text.toString()
         val passwordConfirmation = input_register_password_confirmation?.text.toString()

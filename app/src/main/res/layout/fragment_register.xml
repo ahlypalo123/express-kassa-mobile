@@ -83,15 +83,6 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
         tools:layout_editor_absoluteX="16dp" />
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp"
-        android:text="Я принимаю условия использования"
-        app:layout_constraintTop_toBottomOf="@+id/btn_register" />
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_register_login"
         android:layout_width="match_parent"

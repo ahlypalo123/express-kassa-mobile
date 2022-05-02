@@ -58,22 +58,42 @@ class LoginFragment : Fragment() {
         }
 
         btn_login?.setOnClickListener {
-            val email = input_login_email?.text.toString()
-            val password = input_login_password?.text.toString()
-            val dto = AuthenticationRequest(email, password)
-            api.login(dto).enqueue {
-                onResponse = { resp ->
-                    App.prefEditor
-                        .putString(PREF_TOKEN, resp)
-                        .commit()
-                    context?.let {
-                        startActivity(MainActivity.getStartIntent(it))
-                    }
-                    activity?.finish()
+            login()
+        }
+    }
+
+    private fun validate() : Boolean {
+        if (input_login_email?.text.isNullOrBlank()) {
+            layout_login_email?.error = "Это поле не может быть пустым"
+            return false
+        }
+        if (input_login_password?.text.isNullOrBlank()) {
+            layout_login_password?.error = "Это поле не может быть пустым"
+            return false
+        }
+        return true
+    }
+
+    private fun login() {
+        if (!validate()) {
+            return
+        }
+
+        val email = input_login_email?.text.toString()
+        val password = input_login_password?.text.toString()
+        val dto = AuthenticationRequest(email, password)
+        api.login(dto).enqueue {
+            onResponse = { resp ->
+                App.prefEditor
+                    .putString(PREF_TOKEN, resp)
+                    .commit()
+                context?.let {
+                    startActivity(MainActivity.getStartIntent(it))
                 }
-                onError = {
-                    activity?.showError(it)
-                }
+                activity?.finish()
+            }
+            onError = {
+                activity?.showError(it)
             }
         }
     }

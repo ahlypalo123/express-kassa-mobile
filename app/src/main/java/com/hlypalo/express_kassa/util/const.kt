@@ -5,6 +5,8 @@ const val PREF_EMPLOYEE_NAME = "employee_name"
 const val PREF_LAST_CHECK_SAVED_DATE = "last_check_saved_date"
 const val PREF_PRINTER_ADDRESS = "printer_address"
 const val PREF_PRINTER_NAME = "printer_name"
+const val PREF_TUTORIAL_VIEWED = "tutorial_viewed"
+const val PREF_CHECK = "check"
 
 const val EXTRA_BAR_CODE = "bar_code"
 

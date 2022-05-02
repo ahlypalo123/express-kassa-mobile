@@ -3,46 +3,37 @@ package com.hlypalo.express_kassa.util
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Environment
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ClickableSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.NumberPicker
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.GlideApp
-import com.hlypalo.express_kassa.data.model.CartDto
+import com.hlypalo.express_kassa.data.model.CheckProduct
 import com.hlypalo.express_kassa.data.model.ErrorBody
+import com.hlypalo.express_kassa.data.model.Product
+import org.joda.time.DateTime
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import androidx.core.content.ContextCompat.getSystemService
-
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Environment
-import android.widget.NumberPicker
-import android.widget.TextView
-import android.widget.Toast
-import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentManager
-import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.hlypalo.express_kassa.data.model.Check
-import org.joda.time.DateTime
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
-import java.net.InetAddress
 import java.util.*
-
 
 const val TAG = "Utils"
 
@@ -111,11 +102,6 @@ fun ImageView.loadImageUrl(url: String?, placeholder: Int) {
         .diskCacheStrategy(DiskCacheStrategy.NONE)
         .placeholder(placeholder)
         .into(this)
-}
-
-fun List<CartDto>?.calculateTotal() : Float {
-    this ?: return 0F
-    return map { p -> p.price * p.count }.sum()
 }
 
 fun Context?.alert(
@@ -239,5 +225,38 @@ fun Activity?.showCarouselDialog(
     }
     dialog.show()
     return dialog
+}
 
+fun Context.getShareIntent(file: File) : Intent {
+    return Intent(Intent.ACTION_SEND).apply {
+        type = "image/jpeg"
+        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//            putExtra(
+//                Intent.EXTRA_SUBJECT,
+//                "Sharing file from the AppName"
+//            )
+//            putExtra(
+//                Intent.EXTRA_TEXT,
+//                "Sharing file from the AppName with some description"
+//            )
+        val fileURI = FileProvider.getUriForFile(
+            this@getShareIntent, "com.hlypalo.express_kassa.fileprovider",
+            file
+        )
+        putExtra(Intent.EXTRA_STREAM, fileURI)
+    }
+}
+
+fun Bitmap.compressReceiptToFile(context: Context?) : File {
+    val storageDir = context?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    val temp = File.createTempFile(
+        "Receipt_${UUID.randomUUID()}",
+        ".jpeg",
+        storageDir
+    )
+    val fos = FileOutputStream(temp)
+    compress(Bitmap.CompressFormat.JPEG, 100, fos)
+    return temp
 }

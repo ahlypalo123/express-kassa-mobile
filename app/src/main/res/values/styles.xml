@@ -15,4 +15,22 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/black</item>
     </style>
+
+    <style name="RoundedImageViewRounded">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ShowcaseCustomTheme" parent="ShowcaseView.Light">
+        <item name="sv_backgroundColor">#332A4A7D</item>
+        <item name="sv_showcaseColor">#A2C5FD</item>
+        <item name="sv_buttonText">Hide</item>
+        <item name="sv_tintButtonColor">false</item>
+        <item name="sv_detailTextAppearance">@style/ShowcaseCustomText</item>
+    </style>
+
+    <style name="ShowcaseCustomText" parent="TextAppearance.ShowcaseView.Detail.Light">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

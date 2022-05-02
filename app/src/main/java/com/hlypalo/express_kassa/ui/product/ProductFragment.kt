@@ -3,6 +3,7 @@ package com.hlypalo.express_kassa.ui.product
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.data.model.Product
 import com.hlypalo.express_kassa.ui.base.NavigationFragment
@@ -26,8 +26,8 @@ import kotlinx.android.synthetic.main.item_product.view.*
 
 class ProductFragment : Fragment(), ProductView {
 
-    private val presenter: ProductPresenter by lazy { ProductPresenter(this) }
-    private val adapter: Adapter by lazy { Adapter(presenter.getProductList()) }
+    private val presenter = ProductPresenter(this)
+    private val adapter = Adapter(presenter.getProductList())
 
     companion object {
         private const val ORDER_DELETE = 0
@@ -42,21 +42,8 @@ class ProductFragment : Fragment(), ProductView {
         return inflater.inflate(R.layout.fragment_products, container, false)
     }
 
-    override fun onResume() {
-        super.onResume()
-        setHasOptionsMenu(true)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val activity = activity as AppCompatActivity?
-        activity?.setSupportActionBar(toolbar)
-        activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
-        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
-        setHasOptionsMenu(true)
-
-        list_products?.layoutManager = LinearLayoutManager(context)
-        list_products?.adapter = adapter
+        setupActionBar()
 
         btn_product_add?.visibility = if (parentFragment is MainFragment) {
             View.GONE
@@ -65,17 +52,33 @@ class ProductFragment : Fragment(), ProductView {
         }
 
         presenter.init()
+        list_products?.layoutManager = LinearLayoutManager(context)
+        list_products?.adapter = adapter
 
         btn_product_add?.setOnClickListener {
             activity?.supportFragmentManager
                 ?.beginTransaction()
-                ?.replace(R.id.content_navigation, AddProductFragment())
+                ?.replace(R.id.container, AddProductFragment())
                 ?.addToBackStack(null)?.commit()
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        setupActionBar()
+    }
+
+    private fun setupActionBar() {
+        val activity = activity as AppCompatActivity?
+        activity?.setSupportActionBar(toolbar)
+        activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
+        activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu, menu)
+        inflater.inflate(R.menu.menu_products, menu)
 
         val searchBar = menu.findItem(R.id.search_bar).actionView as? SearchView
 
@@ -132,6 +135,14 @@ class ProductFragment : Fragment(), ProductView {
         text_empty?.visibility = if (b) View.VISIBLE else View.INVISIBLE
     }
 
+    override fun showProgress() {
+        progress_bar?.visibility = View.VISIBLE
+    }
+
+    override fun hideProgress() {
+        progress_bar?.visibility = View.INVISIBLE
+    }
+
     inner class Adapter(private val items: List<Product>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -153,6 +164,13 @@ class ProductFragment : Fragment(), ProductView {
                     tv.text = item.name[0].toString()
                     tv.setTextColor(ContextCompat.getColor(context, R.color.white))
                     tv.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
+                    tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24F)
+                    tv.setPadding(16, 0, 16, 0)
+                    tv.measure(
+                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                    )
+                    tv.layout(0, 0, tv.measuredWidth, tv.measuredHeight)
                     val bmp = getBitmapFromView(tv)
                     image_product?.setImageBitmap(bmp)
                 } else {
@@ -163,7 +181,7 @@ class ProductFragment : Fragment(), ProductView {
                 }
                 if (parentFragment is MainFragment) {
                     setOnClickListener {
-                        presenter.addProductToCart(item)
+                        presenter.addProductToCheck(item)
                     }
                 } else {
                     setOnCreateContextMenuListener(this@ViewHolder)

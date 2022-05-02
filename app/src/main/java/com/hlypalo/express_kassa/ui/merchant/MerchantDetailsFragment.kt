@@ -54,10 +54,10 @@ class MerchantDetailsFragment : Fragment() {
             progress_bar?.visibility = View.VISIBLE
             api.updateMerchantDetails(req).enqueue {
                 activity?.confirm("Настройки успешно обновлены", onYes = {
-                    activity?.supportFragmentManager
-                        ?.beginTransaction()
-                        ?.replace(R.id.content_navigation, MainFragment())
-                        ?.commit()
+                    parentFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.content_navigation, MainFragment())
+                        .commit()
                 }, yesText = "Ok")
                 progress_bar?.visibility = View.INVISIBLE
             }

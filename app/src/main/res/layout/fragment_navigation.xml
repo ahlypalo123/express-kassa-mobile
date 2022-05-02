@@ -5,23 +5,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <View
+            android:id="@+id/placeholder"
+            android:layout_width="16dp"
+            android:layout_margin="16dp"
+            android:layout_gravity="start"
+            android:layout_height="16dp" />
 
         <FrameLayout
             android:id="@+id/content_navigation"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </LinearLayout>
+    </FrameLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation"
         android:layout_width="wrap_content"
+        app:headerLayout="@layout/layout_drawer_header"
         android:layout_height="match_parent"
+        app:itemTextAppearance="@style/TextAppearance.AppCompat"
         android:layout_gravity="start"
         android:background="@android:color/white"
-        app:menu="@menu/navigation_drawer" />
+        app:menu="@menu/menu_navigation" />
 </androidx.drawerlayout.widget.DrawerLayout>

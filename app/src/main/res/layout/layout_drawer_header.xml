@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="#F7F7F7"
+    android:padding="16dp"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="84dp"
+        android:background="@drawable/ic_shop_circle"
+        android:padding="16dp"
+        android:src="@drawable/ic_shop"
+        android:layout_height="84dp" />
+
+    <TextView
+        android:id="@+id/text_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textColor="#969696"
+        android:layout_marginTop="8dp"
+        tools:text="ООО 'Престиж'" />
+
+    <TextView
+        android:id="@+id/text_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textColor="#969696"
+        android:layout_marginTop="8dp"
+        tools:text="Таганрог, 10 новый, 123" />
+
+    <TextView
+        android:id="@+id/text_employee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textColor="#969696"
+        android:layout_marginTop="8dp"
+        tools:text="Работник: Андрей" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

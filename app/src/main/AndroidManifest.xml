@@ -21,10 +21,10 @@
         android:usesCleartextTraffic="true"
         android:name=".App"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Express_kassa">
+        android:theme="@style/AppTheme">
         <activity android:name=".ui.activity.SimpleScannerActivity" />
         <activity android:name=".ui.activity.MainActivity"
-            android:theme="@style/Theme.Express_kassa"
+            android:theme="@style/AppTheme"
             android:exported="true">
             <intent-filter>
                 <action

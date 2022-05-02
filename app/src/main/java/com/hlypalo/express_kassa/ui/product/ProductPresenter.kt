@@ -1,9 +1,7 @@
 package com.hlypalo.express_kassa.ui.product
 
-import com.hlypalo.express_kassa.data.model.CartProduct
 import com.hlypalo.express_kassa.data.model.Product
 import com.hlypalo.express_kassa.data.repository.ProductRepository
-import com.hlypalo.express_kassa.util.showError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,8 +18,10 @@ class ProductPresenter(private val view: ProductView) : CoroutineScope {
     private val repo: ProductRepository = ProductRepository()
 
     fun init() {
+        view.showProgress()
         repo.fetchProductList {
             onResponse = func@{
+                view.hideProgress()
                 view.manageEmpty(it.isNullOrEmpty())
                 it ?: return@func
                 list.clear()
@@ -29,6 +29,7 @@ class ProductPresenter(private val view: ProductView) : CoroutineScope {
                 updateFilteredList(null)
             }
             onError = {
+                view.hideProgress()
                 view.showError(it)
             }
         }
@@ -42,7 +43,7 @@ class ProductPresenter(private val view: ProductView) : CoroutineScope {
         val product = list[position]
         repo.deleteProduct(product.id) {
             onResponse = {
-                list.remove(product)
+                list.removeAt(position)
                 view.updateList()
             }
             onError = {
@@ -65,8 +66,8 @@ class ProductPresenter(private val view: ProductView) : CoroutineScope {
         }
     }
 
-    fun addProductToCart(data: Product) = launch {
-        repo.addProductToCart(CartProduct(0, data.name, data.price))
+    fun addProductToCheck(product: Product) {
+        repo.addProductToCheck(product)
     }
 
 }

@@ -8,18 +8,25 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.model.CartDto
+import com.hlypalo.express_kassa.data.model.CheckProduct
+import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.ui.check.CheckFragment
 import com.hlypalo.express_kassa.ui.product.BarCodeFragment
 import com.hlypalo.express_kassa.ui.product.ProductFragment
 import com.hlypalo.express_kassa.util.inflate
+import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_main.*
-import kotlinx.android.synthetic.main.item_cart.view.*
+import kotlinx.android.synthetic.main.item_check_product_main.*
+import kotlinx.android.synthetic.main.item_check_product_main.view.*
 
-class MainFragment : Fragment(), CartView {
+class MainFragment : Fragment(), MainView {
 
-    private val presenter: CartPresenter by lazy { CartPresenter(this, this) }
+    private val presenter: MainPresenter by lazy { MainPresenter(this) }
     private val cartAdapter: CartAdapter by lazy { CartAdapter() }
+
+    companion object {
+        private const val ORDER_DELETE_FROM_CART = 14
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,10 +45,7 @@ class MainFragment : Fragment(), CartView {
         presenter.init()
 
         btn_check_pay?.setOnClickListener {
-            activity?.supportFragmentManager
-                ?.beginTransaction()
-                ?.replace(R.id.content_navigation, CheckFragment())
-                ?.addToBackStack(null)?.commit()
+            presenter.onPay()
         }
 
         pager_main?.adapter = MainPagerAdapter(this)
@@ -54,17 +58,56 @@ class MainFragment : Fragment(), CartView {
         }.attach()
     }
 
-    override fun updateCart() {
+    override fun onDestroyView() {
+        presenter.unsubscribe()
+        super.onDestroyView()
+    }
+
+    override fun showPaymentMethodDialog() {
+        activity?.supportFragmentManager?.let {
+            PaymentMethodDialog(this).show(it, null)
+        }
+    }
+
+    override fun showChangeDialog() {
+        activity?.supportFragmentManager?.let {
+            ChangeDialog(this).show(it, null)
+        }
+    }
+
+    override fun showError(err: ErrorBody?) {
+        activity?.showError(err)
+    }
+
+    override fun toggleProgress(f: Boolean) {
+        progress_bar?.visibility = if (f) View.VISIBLE else View.INVISIBLE
+    }
+
+    override fun openCheckFragment() {
+        activity?.supportFragmentManager
+            ?.beginTransaction()
+            ?.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+            ?.replace(R.id.container, CheckFragment())
+            ?.addToBackStack(null)?.commit()
+    }
+
+    override fun manageCheckEmpty(b: Boolean) {
+        text_check_empty?.visibility = if (b) View.VISIBLE else View.GONE
+    }
+
+    override fun updateCheck() {
         cartAdapter.notifyDataSetChanged()
     }
 
-    override fun updateTotal(total: Float) {
-        btn_check_pay?.isEnabled = total != 0F
-        btn_check_pay?.text = "Оплатить $total"
+    override fun updateTotal(total: Float?) {
+        btn_check_pay?.isEnabled = total != null && total != 0F
+        btn_check_pay?.text = "Оплатить ${total ?: ""}"
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        presenter.deleteFromCart(item.groupId)
+        if (item.order == ORDER_DELETE_FROM_CART) {
+            presenter.deleteFromCart(item.groupId)
+        }
         return super.onContextItemSelected(item)
     }
 
@@ -85,17 +128,17 @@ class MainFragment : Fragment(), CartView {
     inner class CartAdapter : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            return ViewHolder(parent.inflate(R.layout.item_cart))
+            return ViewHolder(parent.inflate(R.layout.item_check_product_main))
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(presenter.getProductListForCart()[position])
+            holder.bind(presenter.getProductListForCheck()[position])
         }
 
-        override fun getItemCount(): Int = presenter.getProductListForCart().size
+        override fun getItemCount(): Int = presenter.getProductListForCheck().size
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
-            fun bind(item: CartDto) = with(itemView) {
+            fun bind(item: CheckProduct) = with(itemView) {
                 text_cart_name?.text = item.name
                 text_cart_price?.text = (item.price * item.count).toString()
                 text_cart_count?.text = item.count.toString()
@@ -108,7 +151,7 @@ class MainFragment : Fragment(), CartView {
                 menuInfo: ContextMenu.ContextMenuInfo?
             ) {
                 v?.id?.let {
-                    menu?.add(this.adapterPosition, it, 0, R.string.delete)
+                    menu?.add(this.adapterPosition, it, ORDER_DELETE_FROM_CART, R.string.delete)
                 }
             }
         }

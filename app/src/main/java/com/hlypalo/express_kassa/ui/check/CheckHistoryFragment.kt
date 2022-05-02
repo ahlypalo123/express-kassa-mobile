@@ -16,11 +16,15 @@ import com.hlypalo.express_kassa.data.model.Check
 import com.hlypalo.express_kassa.data.model.OrderColumn
 import com.hlypalo.express_kassa.data.repository.CheckRepository
 import com.hlypalo.express_kassa.ui.base.NavigationFragment
+import com.hlypalo.express_kassa.ui.product.AddProductFragment
 import com.hlypalo.express_kassa.util.inflate
 import kotlinx.android.synthetic.main.fragment_check_history.*
 import kotlinx.android.synthetic.main.fragment_check_history.toolbar
 import kotlinx.android.synthetic.main.fragment_shift.*
-import kotlinx.android.synthetic.main.item_check.view.*
+import kotlinx.android.synthetic.main.item_check_history.*
+import kotlinx.android.synthetic.main.item_check_history.text_item_employee
+import kotlinx.android.synthetic.main.item_check_history.text_item_total
+import kotlinx.android.synthetic.main.item_check_history.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -121,7 +125,13 @@ class CheckHistoryFragment : Fragment() {
                 text_item_date?.text = DateTime(item.date).toString("yyyy-MM-dd")
                 text_item_employee?.text = item.employeeName
                 text_item_total?.text = item.total.toString()
-                setOnClickListener {  }
+                setOnClickListener {
+                    activity?.supportFragmentManager
+                        ?.beginTransaction()
+                        ?.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+                        ?.replace(R.id.container, CheckDetailsFragment(item))
+                        ?.addToBackStack(null)?.commit()
+                }
             }
         }
 
