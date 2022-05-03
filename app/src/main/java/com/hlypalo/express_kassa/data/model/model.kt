@@ -36,8 +36,8 @@ data class Check(
     var total: Float? = null,
     var discount: Float? = null,
     var paymentMethod: PaymentMethod? = null,
+    var completed: Boolean = false,
     var cash: Float? = null,
-    var change: Float? = null,
     var customerName: String? = null,
     var customerLast4: Int? = null,
     var products: MutableList<CheckProduct> = mutableListOf(),
@@ -56,5 +56,5 @@ data class MerchantDetails(
     val address: String?,
     val name: String?,
     val taxType: String?,
-    val shift: ShiftDetails? = null
+    var shift: ShiftDetails? = null
 )

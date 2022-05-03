@@ -1,7 +1,6 @@
 package com.hlypalo.express_kassa.util
 
 const val PREF_TOKEN = "token"
-const val PREF_EMPLOYEE_NAME = "employee_name"
 const val PREF_LAST_CHECK_SAVED_DATE = "last_check_saved_date"
 const val PREF_PRINTER_ADDRESS = "printer_address"
 const val PREF_PRINTER_NAME = "printer_name"

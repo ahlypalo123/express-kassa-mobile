@@ -15,34 +15,44 @@
         android:id="@+id/TextView1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18px"
-        android:text="Кассовый чек"
+        android:text="* КАССОВЫЙ ЧЕК *"
         android:textColor="@color/black"
+        android:textSize="32px"
         android:textStyle="bold"
-        android:textSize="24px"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/view13" />
+
+    <TextView
+        android:id="@+id/TextView21"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="ПРИХОД"
+        android:textColor="@color/black"
+        android:textSize="32px"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TextView1" />
 
     <TextView
         android:id="@+id/text_merchant_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8px"
-        android:text="ООО 'ПРОВИНЦИЯ'"
+        android:text="ГБПОУ РО ТАВИАК"
         android:textColor="@color/black"
         android:textSize="24px"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TextView1" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/text_address"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="123, Улица пушкина"
+        android:text="75, Ул. Чехова, г. Таганрог"
         android:textColor="@color/black"
-        android:layout_marginTop="8px"
         android:textSize="24px"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,51 +62,67 @@
         android:id="@+id/list_check_products"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8px"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_address"
+        app:layout_constraintTop_toBottomOf="@+id/TextView21"
         tools:itemCount="2"
         tools:listitem="@layout/item_check_product" />
 
-    <View
-        android:id="@+id/view2"
-        android:layout_width="0dp"
-        android:layout_height="2px"
-        android:layout_marginTop="18px"
-        android:background="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
+    <TextView
+        android:id="@+id/text_discount_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:layout_marginTop="8px"
+        android:text="СКИДКА"
+        android:textColor="@color/black"
+        android:textSize="24px"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/list_check_products" />
+
+    <TextView
+        android:id="@+id/text_discount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18px"
+        android:gravity="end"
+        android:layout_marginTop="8px"
+        android:text="СКИДКА"
+        android:textColor="@color/black"
+        android:textSize="24px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/text_discount_header"
         app:layout_constraintTop_toBottomOf="@+id/list_check_products" />
 
     <TextView
         android:id="@+id/TextView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18px"
         android:gravity="start"
-        android:text="ИТОГО"
+        android:layout_marginTop="8px"
+        android:text="ИТОГ"
         android:textColor="@color/black"
+        android:textSize="32px"
         android:textStyle="bold"
-        android:textSize="24px"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view2" />
+        app:layout_constraintTop_toBottomOf="@+id/text_discount_header" />
 
     <TextView
         android:id="@+id/text_total"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18px"
         android:layout_marginStart="18px"
         android:gravity="end"
-        android:text="ИТОГО"
+        android:layout_marginTop="8px"
+        android:text="ИТОГ"
         android:textColor="@color/black"
-        android:textSize="24px"
+        android:textSize="32px"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/TextView2"
-        app:layout_constraintTop_toBottomOf="@+id/view2" />
+        app:layout_constraintTop_toBottomOf="@+id/text_discount" />
 
     <TextView
         android:id="@+id/text_payment_type"
@@ -104,7 +130,7 @@
         android:layout_height="wrap_content"
         android:gravity="start"
         android:layout_marginTop="8px"
-        android:text="НАЛИЧНЫЕ"
+        android:text="ОПЛАТА НАЛИЧНЫМИ"
         android:textColor="@color/black"
         android:textSize="24px"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -118,7 +144,7 @@
         android:layout_marginStart="18px"
         android:layout_marginTop="8px"
         android:gravity="end"
-        android:text="НАЛИЧНЫЕ"
+        android:text="100000"
         android:textColor="@color/black"
         android:textSize="24px"
         app:layout_constraintEnd_toEndOf="parent"
@@ -129,11 +155,12 @@
         android:id="@+id/view3"
         android:layout_width="0dp"
         android:layout_height="2px"
-        android:layout_marginTop="18px"
+        android:layout_marginTop="8px"
         android:background="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_payment_type" />
+        app:layout_constraintTop_toBottomOf="@+id/text_change" />
 
     <TextView
         android:id="@+id/text_change_header"
@@ -146,7 +173,7 @@
         android:textSize="24px"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view3" />
+        app:layout_constraintTop_toBottomOf="@+id/text_payment_type" />
 
     <TextView
         android:id="@+id/text_change"
@@ -154,40 +181,41 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="18px"
         android:gravity="end"
-        android:text="СДАЧА"
         android:layout_marginTop="8px"
+        android:text="СДАЧА"
         android:textColor="@color/black"
         android:textSize="24px"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/text_change_header"
-        app:layout_constraintTop_toBottomOf="@+id/view3" />
+        app:layout_constraintTop_toBottomOf="@+id/text_paid" />
 
     <TextView
-        android:id="@+id/TextView6"
+        android:id="@+id/text_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="start"
         android:layout_marginTop="8px"
-        android:text="ДАТА"
+        android:text="ДАТА 26.05.2022"
         android:textColor="@color/black"
         android:textSize="24px"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_change_header" />
+        app:layout_constraintTop_toBottomOf="@+id/text_employee_header" />
 
     <TextView
-        android:id="@+id/text_date"
-        android:layout_width="0dp"
+        android:id="@+id/text_time"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16px"
+        android:gravity="start"
         android:layout_marginTop="8px"
-        android:gravity="end"
-        android:layout_marginStart="18px"
-        android:text="ДАТА"
+        android:text="ВРЕМЯ 10:03"
         android:textColor="@color/black"
         android:textSize="24px"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/TextView6"
-        app:layout_constraintTop_toBottomOf="@+id/text_change" />
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toEndOf="@+id/text_date"
+        app:layout_constraintTop_toBottomOf="@+id/text_employee_name" />
 
     <TextView
         android:id="@+id/text_employee_header"
@@ -195,80 +223,112 @@
         android:layout_height="wrap_content"
         android:gravity="start"
         android:layout_marginTop="8px"
-        android:text="КАССИР"
+        android:text="КАССИР:"
         android:textColor="@color/black"
         android:textSize="24px"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TextView6" />
+        app:layout_constraintTop_toBottomOf="@+id/view3" />
 
     <TextView
         android:id="@+id/text_employee_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8px"
-        android:gravity="end"
         android:layout_marginStart="18px"
+        android:gravity="start"
+        android:layout_marginTop="8px"
         android:text="КАССИР"
         android:textColor="@color/black"
         android:textSize="24px"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/text_employee_header"
-        app:layout_constraintTop_toBottomOf="@+id/text_date" />
+        app:layout_constraintTop_toBottomOf="@+id/view3" />
 
     <TextView
         android:id="@+id/text_tax_type_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:text="СНО"
-        android:textColor="@color/black"
+        android:text="СИСТ. НАЛОГООБЛ.:"
         android:layout_marginTop="8px"
+        android:textColor="@color/black"
         android:textSize="24px"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_employee_header" />
+        app:layout_constraintTop_toBottomOf="@+id/text_date" />
 
     <TextView
         android:id="@+id/text_tax_type"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="18px"
-        android:gravity="end"
+        android:layout_marginStart="16px"
+        android:gravity="start"
+        android:layout_marginTop="8px"
         android:text="СНО"
         android:textColor="@color/black"
-        android:layout_marginTop="8px"
         android:textSize="24px"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/text_employee_header"
-        app:layout_constraintTop_toBottomOf="@+id/text_employee_name" />
+        app:layout_constraintStart_toEndOf="@+id/text_tax_type_header"
+        app:layout_constraintTop_toBottomOf="@+id/text_time" />
+
+    <TextView
+        android:id="@+id/text_check_id_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:text="ЧЕК №"
+        android:textColor="@color/black"
+        android:textSize="24px"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_address" />
+
+    <View
+        android:id="@+id/view13"
+        android:layout_width="0dp"
+        android:layout_height="2px"
+        android:background="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_check_id_header" />
+
+    <TextView
+        android:id="@+id/text_check_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:layout_marginHorizontal="16px"
+        android:text="123"
+        android:textColor="@color/black"
+        android:textSize="24px"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toEndOf="@+id/text_check_id_header"
+        app:layout_constraintTop_toBottomOf="@+id/text_address" />
 
     <TextView
         android:id="@+id/text_inn_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="start"
+        android:layout_marginHorizontal="16px"
         android:text="ИНН"
         android:textColor="@color/black"
-        android:layout_marginTop="8px"
         android:textSize="24px"
+        app:layout_constraintEnd_toStartOf="@+id/text_inn"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_tax_type_header" />
+        app:layout_constraintTop_toBottomOf="@+id/text_address" />
 
     <TextView
         android:id="@+id/text_inn"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="18px"
         android:gravity="end"
         android:text="ИНН"
         android:textColor="@color/black"
-        android:layout_marginTop="8px"
         android:textSize="24px"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/text_employee_header"
-        app:layout_constraintTop_toBottomOf="@+id/text_tax_type" />
+        app:layout_constraintTop_toBottomOf="@+id/text_address" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/appCompatImageView"
@@ -278,7 +338,7 @@
         android:src="@drawable/qr_code"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_inn" />
+        app:layout_constraintTop_toBottomOf="@+id/text_tax_type_header" />
 
     <TextView
         android:id="@+id/TextView3"

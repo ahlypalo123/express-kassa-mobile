@@ -1,4 +1,4 @@
-package com.hlypalo.express_kassa.ui.devices
+package com.hlypalo.express_kassa.ui.settings
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -17,12 +17,9 @@ import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.*
-import com.hlypalo.express_kassa.data.repository.ProductRepository
-import com.hlypalo.express_kassa.ui.base.NavigationFragment
-import com.hlypalo.express_kassa.ui.check.CompleteFragment
+import com.hlypalo.express_kassa.ui.main.NavigationFragment
 import com.hlypalo.express_kassa.util.*
 import kotlinx.android.synthetic.main.fragment_printers.*
-import kotlinx.android.synthetic.main.fragmet_add_product.*
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -125,31 +122,33 @@ class PrintersFragment(
 
     private fun getTestCheck() : Check {
         val check = Check(
-            id = 0,
-            total = 320f,
+            id = 54,
             paymentMethod = PaymentMethod.CARD,
             date = System.currentTimeMillis(),
-            employeeName = "Andrey"
+            employeeName = "Андрей",
+            taxType = "ПСН",
+            inn = "500100732259",
+            address = "75, ул. Чехова, г. Таганрог",
+            name = "ГБПОУ РО \"ТАВИАК\""
         )
 
-        val products = listOf(
-            CheckProduct(
-                count = 1,
-                name = "Капучино",
-                price = 100f
-            ),
-            CheckProduct(
-                count = 1,
-                name = "Американо",
-                price = 70f
-            ),
-            CheckProduct(
-                count = 1,
-                name = "Чизкейк",
-                price = 150f
+        val products = mutableListOf<CheckProduct>()
+
+        val list = resources.openRawResource(R.raw.products).reader().readLines()
+        val random = Random()
+
+        for (i in 0 .. 100) {
+            val product = CheckProduct(
+                name = list[random.nextInt(list.size - 1)],
+                price = (random.nextInt(100) * 10).toFloat(),
+                count = random.nextInt(4) + 1
             )
-        )
+            products.add(product)
+        }
+
+        check.total = products.map { it.price }.sum()
         check.products.addAll(products)
+
         return check
     }
 

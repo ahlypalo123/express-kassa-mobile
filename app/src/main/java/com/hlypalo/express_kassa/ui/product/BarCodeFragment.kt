@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.Product
 import com.hlypalo.express_kassa.data.repository.ProductRepository
-import com.hlypalo.express_kassa.ui.base.NavigationFragment
+import com.hlypalo.express_kassa.ui.main.NavigationFragment
 import kotlinx.android.synthetic.main.fragment_bar_code.*
 import kotlinx.android.synthetic.main.fragment_bar_code.toolbar
 import kotlinx.android.synthetic.main.fragment_products.*
@@ -27,6 +27,7 @@ class BarCodeFragment : Fragment(), ZBarScannerView.ResultHandler {
 
     private val repo: ProductRepository by lazy { ProductRepository() }
     private val list: MutableList<Product> by lazy { mutableListOf() }
+    private val presenter: BaseProductPresenter by lazy { BaseProductPresenter() }
 
     private val requestCameraPermissions = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -81,7 +82,7 @@ class BarCodeFragment : Fragment(), ZBarScannerView.ResultHandler {
         MediaPlayer.create(context, R.raw.beep).start()
         CoroutineScope(Dispatchers.IO).launch {
             list.firstOrNull { p -> p.barCode == rawResult?.contents }?.let { p ->
-                repo.addProductToCheck(p)
+                presenter.addProductToCheck(p)
             }
         }
         view?.postDelayed({

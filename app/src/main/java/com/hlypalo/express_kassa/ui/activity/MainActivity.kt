@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.ui.auth.LoginFragment
-import com.hlypalo.express_kassa.ui.base.NavigationFragment
+import com.hlypalo.express_kassa.ui.main.NavigationFragment
 import com.hlypalo.express_kassa.util.PREF_TOKEN
 
 class MainActivity : AppCompatActivity() {

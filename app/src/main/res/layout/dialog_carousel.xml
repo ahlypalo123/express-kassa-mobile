@@ -23,7 +23,7 @@
             tools:text="Expiration Month"/>
     </FrameLayout>
 
-    <com.hlypalo.express_kassa.ui.base.NumberPicker
+    <com.hlypalo.express_kassa.util.NumberPicker
         android:id="@+id/np"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

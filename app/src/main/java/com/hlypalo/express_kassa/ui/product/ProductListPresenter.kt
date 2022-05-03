@@ -8,14 +8,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
-class ProductPresenter(private val view: ProductView) : CoroutineScope {
+class ProductListPresenter(private val view: ProductView) : BaseProductPresenter(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
     private val list: MutableList<Product> = mutableListOf()
     private val filteredList: MutableList<Product> = mutableListOf()
-    private val repo: ProductRepository = ProductRepository()
+    private val repo: ProductRepository by lazy { ProductRepository() }
 
     fun init() {
         view.showProgress()
@@ -64,10 +64,6 @@ class ProductPresenter(private val view: ProductView) : CoroutineScope {
         withContext(Dispatchers.Main) {
             view.updateList()
         }
-    }
-
-    fun addProductToCheck(product: Product) {
-        repo.addProductToCheck(product)
     }
 
 }

@@ -1,4 +1,4 @@
-package com.hlypalo.express_kassa.ui.shift
+package com.hlypalo.express_kassa.ui.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,22 +8,16 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isEmpty
 import androidx.fragment.app.Fragment
-import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.api.ApiService
-import com.hlypalo.express_kassa.data.model.ShiftDetails
 import com.hlypalo.express_kassa.data.model.ShiftRequest
-import com.hlypalo.express_kassa.ui.base.NavigationFragment
-import com.hlypalo.express_kassa.util.PREF_EMPLOYEE_NAME
-import com.hlypalo.express_kassa.util.enqueue
-import kotlinx.android.synthetic.main.fragment_printers.*
+import com.hlypalo.express_kassa.data.repository.MerchantRepository
+import com.hlypalo.express_kassa.ui.main.NavigationFragment
+import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_shift.*
-import kotlinx.android.synthetic.main.fragment_shift.toolbar
 
 class ShiftFragment : Fragment() {
 
-    private val api: ApiService by lazy { ApiService.getInstance() }
-    private var shift: ShiftDetails? = null
+    private val repo: MerchantRepository by lazy { MerchantRepository.instance }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,18 +37,8 @@ class ShiftFragment : Fragment() {
         activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
         setHasOptionsMenu(true)
 
-        api.getCurrentShift().enqueue {
-            onResponse = {
-                it?.let {
-                    shift = it
-                }
-            }
-            onError = {
-                shift = null
-            }
-            finally = {
-                updateUi()
-            }
+        repo.initMerchantDetails().observe(viewLifecycleOwner) {
+            updateUi()
         }
     }
 
@@ -80,36 +64,36 @@ class ShiftFragment : Fragment() {
     }
 
     private fun updateUi() {
+        val shift = repo.getMerchantDetails()?.shift
         input_employee_name?.isEnabled = shift == null
 
         if (shift == null) {
             btn_manage_shift?.text = "Открыть смену"
             btn_manage_shift?.setOnClickListener {
-                if (validateEmployeeName()) {
-                    api.openShift(
-                        ShiftRequest(input_employee_name?.text?.toString()!!)
-                    ).enqueue {
-                        onResponse = {
-                            shift = it
-                            updateUi()
-                            App.prefEditor.putString(PREF_EMPLOYEE_NAME, it?.employeeName)
-                        }
-                    }
-                }
+                openShift()
             }
         } else {
-            input_employee_name?.setText(shift?.employeeName)
+            input_employee_name?.setText(shift.employeeName)
             btn_manage_shift?.text = "Закрыть смену"
             btn_manage_shift?.setOnClickListener {
-                api.closeShift().enqueue {
-                    onResponse = {
-                        shift = null
-                        updateUi()
-                        App.prefEditor.putString(PREF_EMPLOYEE_NAME, null)
-                    }
-                }
+                closeShift()
             }
         }
+    }
+
+    private fun openShift() {
+        if (validateEmployeeName()) {
+            val req = ShiftRequest(employee_name = input_employee_name?.text?.toString()!!)
+            repo.openShift(req, error = {
+                activity?.showError(it)
+            })
+        }
+    }
+
+    private fun closeShift() {
+        repo.closeShift(error = {
+            activity?.showError(it)
+        })
     }
 
 }

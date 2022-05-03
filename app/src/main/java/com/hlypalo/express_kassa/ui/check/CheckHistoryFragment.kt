@@ -15,15 +15,10 @@ import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.Check
 import com.hlypalo.express_kassa.data.model.OrderColumn
 import com.hlypalo.express_kassa.data.repository.CheckRepository
-import com.hlypalo.express_kassa.ui.base.NavigationFragment
-import com.hlypalo.express_kassa.ui.product.AddProductFragment
+import com.hlypalo.express_kassa.ui.main.NavigationFragment
 import com.hlypalo.express_kassa.util.inflate
 import kotlinx.android.synthetic.main.fragment_check_history.*
 import kotlinx.android.synthetic.main.fragment_check_history.toolbar
-import kotlinx.android.synthetic.main.fragment_shift.*
-import kotlinx.android.synthetic.main.item_check_history.*
-import kotlinx.android.synthetic.main.item_check_history.text_item_employee
-import kotlinx.android.synthetic.main.item_check_history.text_item_total
 import kotlinx.android.synthetic.main.item_check_history.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +60,7 @@ class CheckHistoryFragment : Fragment() {
         text_total?.setOnClickListener {
             updateColumn(OrderColumn.TOTAL)
         }
-        text_employee?.setOnClickListener {
+        text_history_employee?.setOnClickListener {
             updateColumn(OrderColumn.EMPLOYEE_NAME)
         }
 
@@ -90,11 +85,11 @@ class CheckHistoryFragment : Fragment() {
     }
 
     private fun updateList() {
-        listOf<TextView?>(text_employee, text_total, text_date).forEach {
+        listOf<TextView?>(text_history_employee, text_total, text_date).forEach {
             it?.typeface = Typeface.DEFAULT
         }
         val field = when (column) {
-            OrderColumn.EMPLOYEE_NAME -> text_employee
+            OrderColumn.EMPLOYEE_NAME -> text_history_employee
             OrderColumn.TOTAL -> text_total
             OrderColumn.DATE -> text_date
         }
@@ -122,7 +117,7 @@ class CheckHistoryFragment : Fragment() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             fun bind(item: Check) = with(itemView) {
-                text_item_date?.text = DateTime(item.date).toString("yyyy-MM-dd")
+                text_item_date?.text = DateTime(item.date).toString("yyyy-MM-dd hh:ss")
                 text_item_employee?.text = item.employeeName
                 text_item_total?.text = item.total.toString()
                 setOnClickListener {

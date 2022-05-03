@@ -18,9 +18,6 @@ import java.util.concurrent.TimeUnit
 
 interface ApiService {
 
-    @GET("/")
-    fun healthCheck() : Call<String>
-
     @POST("/auth/login")
     fun login(@Body req: AuthenticationRequest) : Call<String>
 
@@ -40,9 +37,6 @@ interface ApiService {
     @POST("/photo")
     fun uploadPhotoAsync(@Part image: MultipartBody.Part?) : Deferred<Response<String>>
 
-    @GET("/shift")
-    fun getCurrentShift() : Call<ShiftDetails>
-
     @POST("/shift")
     @Headers("action: OPEN_SHIFT")
     fun openShift(@Body req: ShiftRequest) : Call<ShiftDetails>
@@ -52,7 +46,13 @@ interface ApiService {
     fun closeShift() : Call<Unit>
 
     @POST("/check")
-    fun saveCheckAsync(@Body data: Check) : Deferred<Response<Check>>
+    fun createCheck(@Body check: Check) : Call<Check>
+
+    @PUT("/check")
+    fun updateCheckAsync(@Body data: Check) : Deferred<Response<Check>>
+
+    @DELETE("/check")
+    fun deleteCheck(@Query("id") id: Long) : Call<Unit>
 
     @GET("/check")
     fun getCheckHistoryAsync(@Query("orderColumn") col: OrderColumn) : Deferred<Response<List<Check>>>
@@ -67,18 +67,16 @@ interface ApiService {
     fun updatePassword(@Body req: AuthenticationRequest) : Call<Unit>
 
     @PUT("/merchant")
-    fun updateMerchantDetails(@Body req: MerchantDetails) : Call<Unit>
+    fun updateMerchantDetails(@Body req: MerchantDetails) : Call<MerchantDetails>
 
     @GET("/merchant")
     fun getMerchantDetails() : Call<MerchantDetails>
-
-    @GET("/merchant")
-    fun getMerchantDetailsAsync() : Deferred<Response<MerchantDetails?>>
 
     companion object {
         var apiService: ApiService? = null
 
         private const val BASE_URL = "https://express-kassa.herokuapp.com/"
+        // private const val BASE_URL = "http://10.0.2.2:8080/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {

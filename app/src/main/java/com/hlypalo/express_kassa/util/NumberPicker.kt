@@ -1,4 +1,4 @@
-package com.hlypalo.express_kassa.ui.base
+package com.hlypalo.express_kassa.util
 
 import android.content.Context
 import android.util.AttributeSet

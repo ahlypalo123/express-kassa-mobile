@@ -7,17 +7,16 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.repository.ProductRepository
+import com.hlypalo.express_kassa.data.repository.CheckRepository
 import kotlinx.android.synthetic.main.dialog_change.*
 
 class ChangeDialog(
     private val delegate: MainView
 ) : DialogFragment() {
 
-    private val repo: ProductRepository by lazy { ProductRepository() }
+    private val repo: CheckRepository by lazy { CheckRepository() }
 
     private var cash: Float = 0F
-    private var change: Float = 0F
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,13 +31,13 @@ class ChangeDialog(
         text_total?.text = "К оплате: ${check?.total}"
         input_cash?.addTextChangedListener {
             cash = it.toString().toFloatOrNull() ?: 0F
-            change = cash - check?.total!!
+            val change = cash - check?.total!!
             text_change?.text = "Сдача: $change"
         }
         input_cash?.setText(check?.total.toString())
         btn_continue?.setOnClickListener {
             check?.cash = cash
-            check?.change = change
+            repo.updateCheck(check)
             dismiss()
             delegate.openCheckFragment()
         }

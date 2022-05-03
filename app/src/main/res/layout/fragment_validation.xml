@@ -29,6 +29,7 @@
             android:id="@+id/input_confirmation_code"
             android:layout_width="match_parent"
             android:inputType="number"
+            android:imeOptions="actionDone"
             android:layout_height="wrap_content"
             android:hint="Code" />
     </com.google.android.material.textfield.TextInputLayout>

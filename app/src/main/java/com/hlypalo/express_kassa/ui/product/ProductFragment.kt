@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.data.model.Product
-import com.hlypalo.express_kassa.ui.base.NavigationFragment
+import com.hlypalo.express_kassa.ui.main.NavigationFragment
 import com.hlypalo.express_kassa.ui.main.MainFragment
 import com.hlypalo.express_kassa.util.inflate
 import com.hlypalo.express_kassa.util.loadImageUrl
@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.item_product.view.*
 
 class ProductFragment : Fragment(), ProductView {
 
-    private val presenter = ProductPresenter(this)
+    private val presenter = ProductListPresenter(this)
     private val adapter = Adapter(presenter.getProductList())
 
     companion object {

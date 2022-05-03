@@ -3,6 +3,7 @@ package com.hlypalo.express_kassa.ui.main
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.Check
 import com.hlypalo.express_kassa.data.model.CheckProduct
+import com.hlypalo.express_kassa.data.repository.CheckRepository
 import com.hlypalo.express_kassa.data.repository.ProductRepository
 import com.hlypalo.express_kassa.util.enqueue
 
@@ -11,12 +12,12 @@ class MainPresenter(
 ) {
 
     private var check: Check? = null
-    private val repo: ProductRepository by lazy { ProductRepository() }
+    private val repo: CheckRepository by lazy { CheckRepository() }
     private val api: ApiService by lazy { ApiService.getInstance() }
 
     fun init() {
         check = repo.getCheck()
-        if (check == null) {
+        if (check == null || check!!.completed) {
             check = Check()
             repo.updateCheck(check)
         }
@@ -32,14 +33,29 @@ class MainPresenter(
     }
 
     private fun syncCheck() {
+        val check = repo.getCheck()
+        if (check?.id == null || check.completed) {
+            createCheck()
+        } else {
+            view.toggleProgress(true)
+            api.deleteCheck(check.id).enqueue {
+                onResponse = {
+                    createCheck()
+                    view.toggleProgress(false)
+                }
+                onError = {
+                    view.showError(it)
+                    view.toggleProgress(false)
+                }
+            }
+        }
+    }
+
+    private fun createCheck() {
         view.toggleProgress(true)
-        api.getMerchantDetails().enqueue {
+        api.createCheck(check!!).enqueue {
             onResponse = {
-                check?.name = it?.name
-                check?.employeeName = it?.shift?.employeeName
-                check?.address = it?.address
-                check?.inn = it?.inn
-                check?.taxType = it?.taxType
+                check = it
                 repo.updateCheck(check)
                 view.toggleProgress(false)
                 view.showPaymentMethodDialog()

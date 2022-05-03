@@ -1,35 +1,27 @@
 package com.hlypalo.express_kassa.ui.check
 
-import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.Check
-import com.hlypalo.express_kassa.data.repository.ProductRepository
-import com.hlypalo.express_kassa.ui.devices.PrintersFragment
+import com.hlypalo.express_kassa.data.repository.CheckRepository
+import com.hlypalo.express_kassa.ui.settings.PrintersFragment
 import com.hlypalo.express_kassa.util.CheckBuilder
 import com.hlypalo.express_kassa.util.CheckPrinterUtil
 import com.hlypalo.express_kassa.util.compressReceiptToFile
 import com.hlypalo.express_kassa.util.getShareIntent
 import kotlinx.android.synthetic.main.fragment_complete.*
-import java.io.File
-import java.io.FileOutputStream
-import java.util.*
 import java.util.concurrent.Executors
 
 class CompleteFragment : Fragment() {
 
-    private val repo: ProductRepository by lazy { ProductRepository() }
+    private val repo: CheckRepository by lazy { CheckRepository() }
     private val executor = Executors.newSingleThreadExecutor()
     private lateinit var check: Check
 
@@ -112,7 +104,7 @@ class CompleteFragment : Fragment() {
         if (f) {
             text_print_status?.text = "Чек печатается, пожалуйста подождите"
         }
-        progressBar?.visibility = if (f) View.VISIBLE else View.GONE
+        progressBar?.visibility = if (f) View.VISIBLE else View.INVISIBLE
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -120,7 +112,7 @@ class CompleteFragment : Fragment() {
     }
 
     private fun shareCheck() {
-        val file = CheckBuilder.build(check, context, true)
+        val file = CheckBuilder.build(check, context)
             .compressReceiptToFile(context)
 
         val shareIntent = requireContext().getShareIntent(file)

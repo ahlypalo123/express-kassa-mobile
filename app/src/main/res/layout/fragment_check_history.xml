@@ -27,11 +27,11 @@
         android:textStyle="normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintEnd_toStartOf="@id/text_employee"/>
+        app:layout_constraintEnd_toStartOf="@id/text_history_employee"/>
 
     <TextView
         style="@style/TextAppearance.MaterialComponents.Body1"
-        android:id="@+id/text_employee"
+        android:id="@+id/text_history_employee"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:layout_marginTop="16dp"
@@ -52,7 +52,7 @@
         android:textColor="@color/colorAccent"
         android:text="Сумма"
         android:textStyle="normal"
-        app:layout_constraintStart_toEndOf="@id/text_employee"
+        app:layout_constraintStart_toEndOf="@id/text_history_employee"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -63,7 +63,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_employee"
+        app:layout_constraintTop_toBottomOf="@id/text_history_employee"
         tools:listitem="@layout/item_check_history" />
 
     <ProgressBar

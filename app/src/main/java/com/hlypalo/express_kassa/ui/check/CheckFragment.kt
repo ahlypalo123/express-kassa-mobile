@@ -8,14 +8,8 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.repository.CheckRepository
-import com.hlypalo.express_kassa.data.repository.ProductRepository
-import com.hlypalo.express_kassa.ui.base.NavigationFragment
 import com.hlypalo.express_kassa.util.CheckBuilder
-import com.hlypalo.express_kassa.util.CheckPrinterUtil
-import com.hlypalo.express_kassa.util.enqueue
-import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_check.*
 import kotlinx.android.synthetic.main.fragment_check.image_check
 import kotlinx.android.synthetic.main.fragment_check.toolbar
@@ -28,7 +22,6 @@ import kotlinx.coroutines.withContext
 class CheckFragment : Fragment() {
 
     private val repo: CheckRepository by lazy { CheckRepository() }
-    private val productRepo: ProductRepository by lazy { ProductRepository() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,7 +32,6 @@ class CheckFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         val activity = activity as AppCompatActivity?
         activity?.setSupportActionBar(toolbar)
         activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -47,13 +39,33 @@ class CheckFragment : Fragment() {
         activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
         setHasOptionsMenu(true)
 
-        val check = productRepo.getCheck()
+        updateUi()
+
+        btn_continue?.setOnClickListener {
+            saveCheck()
+        }
+
+        btn_add_discount?.setOnClickListener {
+            activity?.supportFragmentManager?.let { fm ->
+                DiscountDialog(this).show(fm, null)
+            }
+        }
+    }
+
+    fun updateUi() {
+        val check = repo.getCheck()
+
         CheckBuilder.build(check!!, context).let {
             image_check?.setImageBitmap(it)
         }
 
-        btn_continue?.setOnClickListener {
-            saveCheck()
+        if (check.inn.isNullOrBlank() || check.name.isNullOrBlank() ||
+            check.address.isNullOrBlank() || check.taxType.isNullOrBlank()
+        ) {
+            layout_hint1?.visibility = View.VISIBLE
+        }
+        if (check.employeeName.isNullOrBlank()) {
+            layout_hint2?.visibility = View.VISIBLE
         }
     }
 
@@ -72,9 +84,10 @@ class CheckFragment : Fragment() {
 //        val name = input_check_customer_name?.text.toString()
 //        val discount = input_check_discount?.text.toString().toFloatOrNull()
 
-        val req = productRepo.getCheck()!!
+        val req = repo.getCheck()!!
         val check = repo.saveCheck(req) ?: return@launch
-        productRepo.updateCheck(check)
+        check.completed = true
+        repo.updateCheck(check)
         withContext(Dispatchers.Main) {
             activity?.supportFragmentManager
                 ?.beginTransaction()

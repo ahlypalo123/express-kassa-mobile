@@ -8,10 +8,11 @@
 
     <TextView
         android:id="@+id/text_check_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintHorizontal_bias="0"
         android:layout_marginTop="8px"
+        android:gravity="start"
         android:layout_marginEnd="18px"
         android:textSize="24px"
         android:textColor="@color/black"
@@ -34,12 +35,21 @@
     <TextView
         android:id="@+id/text_check_total"
         android:layout_width="wrap_content"
-        android:layout_marginTop="8px"
         android:layout_height="wrap_content"
         android:textSize="24px"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_check_price"
         tools:text="= 100" />
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="0dp"
+        android:layout_height="1px"
+        android:background="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_check_total" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

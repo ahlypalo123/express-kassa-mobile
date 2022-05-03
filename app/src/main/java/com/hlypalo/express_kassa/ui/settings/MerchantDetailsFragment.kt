@@ -1,4 +1,4 @@
-package com.hlypalo.express_kassa.ui.merchant
+package com.hlypalo.express_kassa.ui.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,18 +10,19 @@ import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.MerchantDetails
-import com.hlypalo.express_kassa.ui.base.NavigationFragment
+import com.hlypalo.express_kassa.data.repository.MerchantRepository
+import com.hlypalo.express_kassa.ui.main.NavigationFragment
 import com.hlypalo.express_kassa.ui.main.MainFragment
 import com.hlypalo.express_kassa.util.confirm
 import com.hlypalo.express_kassa.util.enqueue
 import com.hlypalo.express_kassa.util.showCarouselDialog
+import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_merchant_details.*
 import kotlinx.android.synthetic.main.fragment_merchant_details.toolbar
-import kotlinx.android.synthetic.main.fragment_shift.*
 
 class MerchantDetailsFragment : Fragment() {
 
-    private val api: ApiService by lazy { ApiService.getInstance() }
+    private val repo: MerchantRepository by lazy { MerchantRepository.instance }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,23 +45,7 @@ class MerchantDetailsFragment : Fragment() {
         updateUi()
 
         btn_save?.setOnClickListener {
-            val req = MerchantDetails(
-                id = 0,
-                inn = input_inn?.text?.toString(),
-                name = input_organization?.text?.toString(),
-                taxType = input_tax_type?.text?.toString(),
-                address = input_address?.text?.toString()
-            )
-            progress_bar?.visibility = View.VISIBLE
-            api.updateMerchantDetails(req).enqueue {
-                activity?.confirm("Настройки успешно обновлены", onYes = {
-                    parentFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.content_navigation, MainFragment())
-                        .commit()
-                }, yesText = "Ok")
-                progress_bar?.visibility = View.INVISIBLE
-            }
+            update()
         }
 
         input_tax_type?.setOnFocusChangeListener { _, b ->
@@ -72,6 +57,29 @@ class MerchantDetailsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun update() {
+        val req = MerchantDetails(
+            id = 0,
+            inn = input_inn?.text?.toString(),
+            name = input_organization?.text?.toString(),
+            taxType = input_tax_type?.text?.toString(),
+            address = input_address?.text?.toString()
+        )
+
+        progress_bar?.visibility = View.VISIBLE
+        repo.updateMerchantDetails(req, callback = {
+            activity?.confirm("Настройки успешно обновлены", onYes = {
+                parentFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.content_navigation, MainFragment())
+                    .commit()
+            }, yesText = "Ok")
+            progress_bar?.visibility = View.INVISIBLE
+        }, error = {
+            activity?.showError(it)
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -87,13 +95,11 @@ class MerchantDetailsFragment : Fragment() {
     }
 
     private fun updateUi() {
-        api.getMerchantDetails().enqueue {
-            onResponse = {
-                input_inn?.setText(it?.inn)
-                input_address?.setText(it?.address)
-                input_organization?.setText(it?.name)
-                input_tax_type?.setText(it?.taxType)
-            }
+        repo.getMerchantDetails().let {
+            input_inn?.setText(it?.inn)
+            input_address?.setText(it?.address)
+            input_organization?.setText(it?.name)
+            input_tax_type?.setText(it?.taxType)
         }
     }
 

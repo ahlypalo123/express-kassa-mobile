@@ -23,13 +23,14 @@ import org.joda.time.DateTime
 
 object CheckBuilder {
 
-    fun build(check: Check, context: Context?, withPadding: Boolean = false) : Bitmap {
+    fun build(check: Check, context: Context?) : Bitmap {
         val view = LayoutInflater.from(context).inflate(R.layout.layout_check, null)
         with(view) {
-            if (withPadding) {
-                layout_check?.setPadding(32, 0, 32, 32)
-            }
+//            if (withPadding) {
+//                layout_check?.setPadding(32, 0, 32, 32)
+//            }
 
+            text_check_id?.text = check.id.toString()
             text_total.text = check.total.toString()
 
             setTextIfNotNull(check.name, text_merchant_name)
@@ -37,11 +38,20 @@ object CheckBuilder {
             setTextIfNotNull(check.taxType, text_tax_type, text_tax_type_header)
             setTextIfNotNull(check.inn, text_inn, text_inn_header)
             setTextIfNotNull(check.employeeName, text_employee_name, text_employee_header)
-            setTextIfNotNull(check.change?.toString(), text_change, text_change_header)
+            setTextIfNotNull((check.discount ?: "").toString(), text_discount, text_discount_header)
+
+            if (check.cash != 0F && check.cash != null && check.cash != check.total) {
+                text_change?.visibility = View.VISIBLE
+                text_change_header?.visibility = View.VISIBLE
+                text_change?.text = (check.cash!! - check.total!!).toString()
+            } else {
+                text_change?.visibility = View.GONE
+                text_change_header?.visibility = View.GONE
+            }
 
             list_check_products?.layoutManager = LinearLayoutManager(context)
             list_check_products?.adapter = Adapter(check.products)
-            val pm = if (check.paymentMethod == PaymentMethod.CASH) "НАЛИЧНЫЕ" else "БЕЗНАЛ"
+            val pm = if (check.paymentMethod == PaymentMethod.CASH) "ОПЛАТА НАЛИЧНЫМИ" else "ОПЛАТА КАРТОЙ"
             text_payment_type?.text = pm
             val paid = if (check.paymentMethod == PaymentMethod.CASH) {
                 check.cash
@@ -49,7 +59,9 @@ object CheckBuilder {
                 check.total
             }
             text_paid?.text = paid.toString()
-            text_date?.text = DateTime(check.date).toString("yyyy-MM-dd")
+            val date = DateTime(check.date)
+            text_date?.text = "ДАТА ${date.toString("yyyy-MM-dd")}"
+            text_time?.text = "ВРЕМЯ ${date.toString("hh:mm")}"
         }
 
         view.measure(

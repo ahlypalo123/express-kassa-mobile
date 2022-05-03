@@ -13,7 +13,6 @@ import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.AuthenticationRequest
 import com.hlypalo.express_kassa.ui.activity.MainActivity
-import com.hlypalo.express_kassa.ui.base.NavigationFragment
 import com.hlypalo.express_kassa.util.PREF_TOKEN
 import com.hlypalo.express_kassa.util.enqueue
 import com.hlypalo.express_kassa.util.showError
