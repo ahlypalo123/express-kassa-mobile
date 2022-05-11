@@ -56,6 +56,7 @@ class MainPresenter(
         api.createCheck(check!!).enqueue {
             onResponse = {
                 check = it
+                check?.date = System.currentTimeMillis()
                 repo.updateCheck(check)
                 view.toggleProgress(false)
                 view.showPaymentMethodDialog()

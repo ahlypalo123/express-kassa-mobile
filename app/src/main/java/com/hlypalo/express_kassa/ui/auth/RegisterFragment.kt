@@ -43,8 +43,9 @@ class RegisterFragment : Fragment() {
         text_register_login?.setOnClickListener {
             activity?.supportFragmentManager
                 ?.beginTransaction()
+                ?.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                 ?.replace(R.id.container, LoginFragment())
-                ?.addToBackStack(null)?.commit()
+                ?.commit()
         }
 
         btn_register?.setOnClickListener {
@@ -56,18 +57,26 @@ class RegisterFragment : Fragment() {
         if (input_register_email?.text.isNullOrBlank()) {
             layout_register_email?.error = "Это поле не может быть пустым"
             return false
+        } else {
+            layout_register_email?.error = null
         }
         if (input_register_password?.text.isNullOrBlank()) {
             layout_register_password?.error = "Это поле не может быть пустым"
             return false
+        } else {
+            layout_register_password?.error = null
         }
         if (input_register_password_confirmation?.text.isNullOrBlank()) {
             input_register_password_confirmation?.error = "Это поле не может быть пустым"
             return false
+        } else {
+            input_register_password_confirmation?.error = null
         }
-        if (input_register_password_confirmation?.text != input_register_password?.text) {
+        if (input_register_password_confirmation?.text.toString() != input_register_password?.text.toString()) {
             input_register_password_confirmation?.error = "Значение не соответствует полю 'Пароль'"
             return false
+        } else {
+            input_register_password_confirmation?.error = null
         }
         return true
     }

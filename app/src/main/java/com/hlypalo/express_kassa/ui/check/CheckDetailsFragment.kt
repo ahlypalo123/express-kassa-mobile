@@ -1,6 +1,6 @@
 package com.hlypalo.express_kassa.ui.check
 
-import android.graphics.Bitmap
+import android.graphics.*
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +11,7 @@ import com.hlypalo.express_kassa.util.*
 import kotlinx.android.synthetic.main.fragment_check_details.*
 import kotlinx.android.synthetic.main.fragment_check_details.image_check
 import kotlinx.android.synthetic.main.fragment_check_details.toolbar
+
 
 class CheckDetailsFragment(private var check: Check) : Fragment() {
 

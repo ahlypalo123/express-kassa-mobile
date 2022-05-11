@@ -13,12 +13,14 @@ import com.github.amlcurran.showcaseview.targets.ViewTarget
 import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.api.ApiService
+import com.hlypalo.express_kassa.data.repository.CheckRepository
 import com.hlypalo.express_kassa.data.repository.MerchantRepository
 import com.hlypalo.express_kassa.ui.activity.MainActivity
 import com.hlypalo.express_kassa.ui.check.CheckHistoryFragment
 import com.hlypalo.express_kassa.ui.settings.PrintersFragment
 import com.hlypalo.express_kassa.ui.settings.MerchantDetailsFragment
 import com.hlypalo.express_kassa.ui.product.ProductFragment
+import com.hlypalo.express_kassa.ui.settings.ReceiptLayoutFragment
 import com.hlypalo.express_kassa.ui.settings.ShiftFragment
 import com.hlypalo.express_kassa.util.PREF_TOKEN
 import com.hlypalo.express_kassa.util.PREF_TUTORIAL_VIEWED
@@ -28,10 +30,10 @@ import kotlinx.android.synthetic.main.layout_drawer_header.*
 
 class NavigationFragment : Fragment() {
 
-    private val api: ApiService by lazy { ApiService.getInstance() }
     private var showcaseView: ShowcaseView? = null
     private var lastSelected: Int = 0
     private val repo: MerchantRepository by lazy { MerchantRepository.instance }
+    private val checkRepo: CheckRepository by lazy { CheckRepository() }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt("lastSelected", lastSelected)
@@ -91,6 +93,9 @@ class NavigationFragment : Fragment() {
             R.id.navigation_devices -> {
                 PrintersFragment()
             }
+            R.id.navigation_receipt -> {
+                ReceiptLayoutFragment()
+            }
             R.id.navigation_settings -> {
                 MerchantDetailsFragment()
             }
@@ -120,12 +125,12 @@ class NavigationFragment : Fragment() {
             selectItem(R.id.navigation_settings)
         }
         repo.initMerchantDetails().observe(viewLifecycleOwner) {
-            text_name?.text = it.name
-            text_address?.text = it.address
-            text_employee?.text = "Работник: ${it.shift?.employeeName}"
-            text_name?.visibility = if (it.name.isNullOrBlank()) View.GONE else View.VISIBLE
-            text_address?.visibility = if (it.address.isNullOrBlank()) View.GONE else View.VISIBLE
-            text_employee?.visibility = if (it.shift?.employeeName.isNullOrBlank()) View.GONE else View.VISIBLE
+            text_name?.text = it?.name
+            text_address?.text = it?.address
+            text_employee?.text = "Работник: ${it?.shift?.employeeName}"
+            text_name?.visibility = if (it?.name.isNullOrBlank()) View.GONE else View.VISIBLE
+            text_address?.visibility = if (it?.address.isNullOrBlank()) View.GONE else View.VISIBLE
+            text_employee?.visibility = if (it?.shift?.employeeName.isNullOrBlank()) View.GONE else View.VISIBLE
         }
     }
 
@@ -139,6 +144,8 @@ class NavigationFragment : Fragment() {
         context?.let {
             startActivity(MainActivity.getStartIntent(it))
         }
+        repo.clearCache()
+        checkRepo.clearCache()
         activity?.finish()
     }
 

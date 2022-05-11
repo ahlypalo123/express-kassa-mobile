@@ -21,6 +21,10 @@ class MerchantRepository private constructor() {
         return liveData.value
     }
 
+    fun clearCache() {
+        liveData.postValue(null)
+    }
+
     fun initMerchantDetails() : LiveData<MerchantDetails> {
         if (liveData.value == null) {
             api.getMerchantDetails().enqueue {

@@ -57,6 +57,9 @@ interface ApiService {
     @GET("/check")
     fun getCheckHistoryAsync(@Query("orderColumn") col: OrderColumn) : Deferred<Response<List<Check>>>
 
+    @GET("/check")
+    fun getCheckHistory(@Query("orderColumn") col: OrderColumn) : Call<List<Check>>
+
     @POST("/auth/forgot-password")
     fun forgotPassword(@Body req: AuthenticationRequest) : Call<Unit>
 

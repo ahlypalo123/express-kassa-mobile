@@ -71,10 +71,10 @@ class MerchantDetailsFragment : Fragment() {
         progress_bar?.visibility = View.VISIBLE
         repo.updateMerchantDetails(req, callback = {
             activity?.confirm("Настройки успешно обновлены", onYes = {
-                parentFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.content_navigation, MainFragment())
-                    .commit()
+//                parentFragmentManager
+//                    .beginTransaction()
+//                    .replace(R.id.content_navigation, MainFragment())
+//                    .commit()
             }, yesText = "Ok")
             progress_bar?.visibility = View.INVISIBLE
         }, error = {

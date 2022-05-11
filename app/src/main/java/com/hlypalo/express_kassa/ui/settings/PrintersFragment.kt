@@ -137,7 +137,7 @@ class PrintersFragment(
         val list = resources.openRawResource(R.raw.products).reader().readLines()
         val random = Random()
 
-        for (i in 0 .. 100) {
+        for (i in 0 .. 10) {
             val product = CheckProduct(
                 name = list[random.nextInt(list.size - 1)],
                 price = (random.nextInt(100) * 10).toFloat(),

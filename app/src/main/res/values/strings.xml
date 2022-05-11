@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">express_kassa</string>
+    <string name="app_name">ExpressKassa</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="date">Date</string>

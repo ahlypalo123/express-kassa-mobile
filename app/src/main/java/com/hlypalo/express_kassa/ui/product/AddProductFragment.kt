@@ -85,7 +85,7 @@ class AddProductFragment : Fragment() {
         ActivityResultContracts.GetContent()
     ) { result ->
         result ?: return@registerForActivityResult
-        currentPhotoPath = PathUtil.getPath(context, result)
+        currentPhotoPath = PathUtil(context).getPath(result)
         updateImage()
     }
 

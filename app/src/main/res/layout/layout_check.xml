@@ -335,6 +335,7 @@
         android:layout_width="94px"
         android:layout_height="94px"
         android:layout_marginTop="8px"
+        android:visibility="gone"
         android:src="@drawable/qr_code"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -37,6 +37,7 @@ class ShiftFragment : Fragment() {
         activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
         setHasOptionsMenu(true)
 
+        updateUi()
         repo.initMerchantDetails().observe(viewLifecycleOwner) {
             updateUi()
         }

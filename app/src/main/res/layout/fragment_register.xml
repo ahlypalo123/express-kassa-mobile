@@ -71,7 +71,7 @@
             android:id="@+id/input_register_password_confirmation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeOptions="actionNext"
+            android:imeOptions="actionDone"
             android:inputType="textPassword"
             android:hint="Подтверждение пароля" />
     </com.google.android.material.textfield.TextInputLayout>

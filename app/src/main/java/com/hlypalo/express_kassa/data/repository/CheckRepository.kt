@@ -6,9 +6,11 @@ import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.db.dao.CheckDao
 import com.hlypalo.express_kassa.data.model.Check
+import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.data.model.OrderColumn
 import com.hlypalo.express_kassa.util.PREF_CHECK
 import com.hlypalo.express_kassa.util.PREF_LAST_CHECK_SAVED_DATE
+import com.hlypalo.express_kassa.util.enqueue
 
 // stores check records to the local database
 // if has internet connection - also saves to the server
@@ -29,9 +31,19 @@ class CheckRepository {
         return resp.body()
     }
 
-    suspend fun getCheckHistory(orderColumn: OrderColumn) : List<Check>? {
-        // return dao.getAll()
-        return api.getCheckHistoryAsync(orderColumn).await().body()
+    fun getCheckHistory(
+        orderColumn: OrderColumn,
+        callback: (List<Check>?) -> Unit,
+        error: (ErrorBody?) -> Unit
+    ) {
+        api.getCheckHistory(orderColumn).enqueue {
+            onResponse = {
+                callback(it)
+            }
+            onError = {
+                error(it)
+            }
+        }
     }
 
     suspend fun sync() {
@@ -53,6 +65,10 @@ class CheckRepository {
 
     fun updateCheck(check: Check?) {
         App.prefEditor.putString(PREF_CHECK, Gson().toJson(check)).commit()
+    }
+
+    fun clearCache() {
+        App.prefEditor.remove(PREF_CHECK).commit()
     }
 
     fun getCheck() : Check? {

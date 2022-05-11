@@ -45,13 +45,15 @@ class LoginFragment : Fragment() {
         text_login_register?.setOnClickListener {
             activity?.supportFragmentManager
                 ?.beginTransaction()
+                ?.setCustomAnimations(R.anim.pop_enter, R.anim.pop_exit, R.anim.enter, R.anim.exit)
                 ?.replace(R.id.container, RegisterFragment())
-                ?.addToBackStack(null)?.commit()
+                ?.commit()
         }
 
         text_forgot_password?.setOnClickListener {
             activity?.supportFragmentManager
                 ?.beginTransaction()
+                ?.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                 ?.replace(R.id.container, ForgotPasswordFragment())
                 ?.addToBackStack(null)?.commit()
         }
@@ -65,10 +67,14 @@ class LoginFragment : Fragment() {
         if (input_login_email?.text.isNullOrBlank()) {
             layout_login_email?.error = "Это поле не может быть пустым"
             return false
+        } else {
+            layout_login_email?.error = null
         }
         if (input_login_password?.text.isNullOrBlank()) {
             layout_login_password?.error = "Это поле не может быть пустым"
             return false
+        } else {
+            layout_login_password?.error = null
         }
         return true
     }
