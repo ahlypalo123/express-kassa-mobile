@@ -23,6 +23,7 @@
             android:checked="true" />
         <item
             android:id="@+id/navigation_receipt"
+            android:visible="false"
             android:title="Шаблон (В разработке)"
             android:checked="true" />
         <item

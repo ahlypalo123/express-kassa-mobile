@@ -11,7 +11,7 @@ import com.hlypalo.express_kassa.data.repository.CheckRepository
 import kotlinx.android.synthetic.main.dialog_change.*
 
 class ChangeDialog(
-    private val delegate: MainView
+    private val delegate: MainProductView
 ) : DialogFragment() {
 
     private val repo: CheckRepository by lazy { CheckRepository() }

@@ -8,11 +8,10 @@ import androidx.fragment.app.DialogFragment
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.PaymentMethod
 import com.hlypalo.express_kassa.data.repository.CheckRepository
-import com.hlypalo.express_kassa.data.repository.ProductRepository
 import kotlinx.android.synthetic.main.dialog_payment_method.*
 
 class PaymentMethodDialog(
-    private val delegate: MainView
+    private val delegate: MainProductView
 ) : DialogFragment() {
 
     private val repo: CheckRepository by lazy { CheckRepository() }

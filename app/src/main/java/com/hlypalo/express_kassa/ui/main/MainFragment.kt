@@ -19,10 +19,10 @@ import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.item_check_product_main.*
 import kotlinx.android.synthetic.main.item_check_product_main.view.*
 
-class MainFragment : Fragment(), MainView {
+class MainFragment : Fragment(), MainProductView {
 
-    private val presenter: MainPresenter by lazy { MainPresenter(this) }
-    private val cartAdapter: CartAdapter by lazy { CartAdapter() }
+    private val presenter: MainProductPresenter by lazy { MainProductPresenter(this) }
+    private val checkAdapter: CheckItemAdapter by lazy { CheckItemAdapter() }
 
     companion object {
         private const val ORDER_DELETE_FROM_CART = 14
@@ -40,7 +40,7 @@ class MainFragment : Fragment(), MainView {
         super.onViewCreated(view, savedInstanceState)
 
         list_cart?.layoutManager = LinearLayoutManager(context)
-        list_cart?.adapter = cartAdapter
+        list_cart?.adapter = checkAdapter
 
         presenter.init()
 
@@ -63,7 +63,7 @@ class MainFragment : Fragment(), MainView {
         super.onDestroyView()
     }
 
-    override fun showPaymentMethodDialog() {
+    override fun startPayment() {
         activity?.supportFragmentManager?.let {
             PaymentMethodDialog(this).show(it, null)
         }
@@ -96,7 +96,7 @@ class MainFragment : Fragment(), MainView {
     }
 
     override fun updateCheck() {
-        cartAdapter.notifyDataSetChanged()
+        checkAdapter.notifyDataSetChanged()
     }
 
     override fun updateTotal(total: Float?) {
@@ -106,7 +106,7 @@ class MainFragment : Fragment(), MainView {
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         if (item.order == ORDER_DELETE_FROM_CART) {
-            presenter.deleteFromCart(item.groupId)
+            presenter.deleteFromCheck(item.groupId)
         }
         return super.onContextItemSelected(item)
     }
@@ -125,7 +125,7 @@ class MainFragment : Fragment(), MainView {
 
     }
 
-    inner class CartAdapter : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
+    inner class CheckItemAdapter : RecyclerView.Adapter<CheckItemAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(parent.inflate(R.layout.item_check_product_main))
@@ -139,7 +139,11 @@ class MainFragment : Fragment(), MainView {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
             fun bind(item: CheckProduct) = with(itemView) {
-                text_cart_name?.text = item.name
+                text_cart_name?.text = if (item.name.isNullOrBlank()) {
+                    "Товар без названия"
+                } else {
+                    item.name
+                }
                 text_cart_price?.text = (item.price * item.count).toString()
                 text_cart_count?.text = item.count.toString()
                 setOnCreateContextMenuListener(this@ViewHolder)

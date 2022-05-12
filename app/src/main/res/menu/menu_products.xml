@@ -9,4 +9,9 @@
         android:icon="@drawable/ic_baseline_search_24"
         app:showAsAction="ifRoom|collapseActionView"
         />
+    <item
+        android:id="@+id/interface_free_sale"
+        android:title="Free Sale"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:icon="@drawable/ic_dollar" />
 </menu> 

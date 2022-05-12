@@ -12,14 +12,14 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.data.model.Product
+import com.hlypalo.express_kassa.ui.main.FreeSaleFragment
 import com.hlypalo.express_kassa.ui.main.NavigationFragment
 import com.hlypalo.express_kassa.ui.main.MainFragment
-import com.hlypalo.express_kassa.util.inflate
-import com.hlypalo.express_kassa.util.loadImageUrl
-import com.hlypalo.express_kassa.util.showError
+import com.hlypalo.express_kassa.util.*
 import kotlinx.android.synthetic.main.fragment_navigation.*
 import kotlinx.android.synthetic.main.fragment_products.*
 import kotlinx.android.synthetic.main.item_product.view.*
@@ -79,7 +79,7 @@ class ProductFragment : Fragment(), ProductView {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_products, menu)
-
+        menu.findItem(R.id.interface_free_sale).isVisible = parentFragment is MainFragment
         val searchBar = menu.findItem(R.id.search_bar).actionView as? SearchView
 
         searchBar?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -102,6 +102,9 @@ class ProductFragment : Fragment(), ProductView {
                     ?.findFragmentByTag(NavigationFragment::class.java.simpleName)
                 (fragment as? NavigationFragment)?.openDrawer()
                 return true
+            }
+            R.id.interface_free_sale -> {
+                App.prefEditor.putBoolean(PREF_INTERFACE_TYPE_FREE_SALE, true).commit()
             }
         }
         return super.onOptionsItemSelected(item)

@@ -1,39 +1,47 @@
 package com.hlypalo.express_kassa.ui.main
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
-import androidx.annotation.MenuRes
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import com.github.amlcurran.showcaseview.ShowcaseView
 import com.github.amlcurran.showcaseview.targets.ViewTarget
 import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.repository.CheckRepository
 import com.hlypalo.express_kassa.data.repository.MerchantRepository
 import com.hlypalo.express_kassa.ui.activity.MainActivity
 import com.hlypalo.express_kassa.ui.check.CheckHistoryFragment
-import com.hlypalo.express_kassa.ui.settings.PrintersFragment
-import com.hlypalo.express_kassa.ui.settings.MerchantDetailsFragment
 import com.hlypalo.express_kassa.ui.product.ProductFragment
+import com.hlypalo.express_kassa.ui.settings.MerchantDetailsFragment
+import com.hlypalo.express_kassa.ui.settings.PrintersFragment
 import com.hlypalo.express_kassa.ui.settings.ReceiptLayoutFragment
 import com.hlypalo.express_kassa.ui.settings.ShiftFragment
+import com.hlypalo.express_kassa.util.PREF_INTERFACE_TYPE_FREE_SALE
 import com.hlypalo.express_kassa.util.PREF_TOKEN
 import com.hlypalo.express_kassa.util.PREF_TUTORIAL_VIEWED
-import com.hlypalo.express_kassa.util.enqueue
 import kotlinx.android.synthetic.main.fragment_navigation.*
 import kotlinx.android.synthetic.main.layout_drawer_header.*
 
 class NavigationFragment : Fragment() {
 
     private var showcaseView: ShowcaseView? = null
-    private var lastSelected: Int = 0
+    private var lastSelected: Int = R.id.navigation_home
     private val repo: MerchantRepository by lazy { MerchantRepository.instance }
     private val checkRepo: CheckRepository by lazy { CheckRepository() }
+    private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == PREF_INTERFACE_TYPE_FREE_SALE) {
+            setFragment(if (App.sharedPrefs.getBoolean(PREF_INTERFACE_TYPE_FREE_SALE, false)) {
+                FreeSaleFragment()
+            } else {
+                MainFragment()
+            })
+        }
+    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt("lastSelected", lastSelected)
@@ -53,7 +61,6 @@ class NavigationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupHeader()
-        pushFragment(MainFragment())
 
         if (!App.sharedPrefs.getBoolean(PREF_TUTORIAL_VIEWED, false)) {
             App.prefEditor.putBoolean(PREF_TUTORIAL_VIEWED, true).commit()
@@ -69,6 +76,13 @@ class NavigationFragment : Fragment() {
             selectItem(item.itemId)
             return@func true
         }
+
+        App.sharedPrefs.registerOnSharedPreferenceChangeListener(listener)
+    }
+
+    override fun onDestroyView() {
+        App.sharedPrefs.unregisterOnSharedPreferenceChangeListener(listener)
+        super.onDestroyView()
     }
 
     private fun selectItem(@IdRes id: Int) {
@@ -78,7 +92,11 @@ class NavigationFragment : Fragment() {
                 ProductFragment()
             }
             R.id.navigation_home -> {
-                MainFragment()
+                if (App.sharedPrefs.getBoolean(PREF_INTERFACE_TYPE_FREE_SALE, false)) {
+                    FreeSaleFragment()
+                } else {
+                    MainFragment()
+                }
             }
             R.id.navigation_shift -> {
                 ShiftFragment()
@@ -103,7 +121,7 @@ class NavigationFragment : Fragment() {
                 MainFragment()
             }
         }?.let {
-            pushFragment(it)
+            setFragment(it)
         }
         layout_navigation?.closeDrawers()
     }
@@ -149,7 +167,7 @@ class NavigationFragment : Fragment() {
         activity?.finish()
     }
 
-    private fun pushFragment(fragment: Fragment) {
+    private fun setFragment(fragment: Fragment) {
         childFragmentManager
             .beginTransaction()
             .replace(R.id.content_navigation, fragment)
