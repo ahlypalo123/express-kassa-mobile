@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
 import androidx.core.view.children
+import androidx.core.widget.addTextChangedListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.util.CustomSpinner
@@ -54,12 +55,11 @@ class TextFormatDialog(
         check_bold?.isChecked = el.style.contains(ReceiptStyle.BOLD) == true
         check_underlined?.isChecked = el.style.contains(ReceiptStyle.UNDERLINED) == true
 
-        input_text?.setOnFocusChangeListener { _, b ->
-            if (!b) {
-                el.text = input_text?.text.toString()
-            }
+        input_text?.addTextChangedListener {
+            el.text = input_text?.text.toString()
             updateUi()
         }
+
         radio_alignment?.setOnCheckedChangeListener { _, i ->
             el.alignment = when (radio_alignment?.getCheckedPosition()!!) {
                 0 -> TextView.TEXT_ALIGNMENT_TEXT_START

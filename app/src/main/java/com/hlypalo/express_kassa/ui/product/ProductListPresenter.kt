@@ -44,7 +44,7 @@ class ProductListPresenter(private val view: ProductView) : BaseProductPresenter
         repo.deleteProduct(product.id) {
             onResponse = {
                 list.removeAt(position)
-                view.updateList()
+                updateFilteredList(null)
             }
             onError = {
                 view.showError(it)

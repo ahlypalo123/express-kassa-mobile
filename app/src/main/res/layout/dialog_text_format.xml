@@ -37,6 +37,7 @@
             android:id="@+id/input_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
             android:hint="Текст"
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
