@@ -14,8 +14,8 @@ import com.hlypalo.express_kassa.util.CustomSpinner
 import kotlinx.android.synthetic.main.dialog_text_format.*
 
 class TextFormatDialog(
-    private val el: ReceiptElement
-) : BottomSheetDialogFragment() {
+    private val el: ReceiptTemplate.Element
+) : BottomSheetDialogFragment(), VariableDelegate {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,15 +34,11 @@ class TextFormatDialog(
         setStyle(STYLE_NORMAL, R.style.BottomSheetDialog)
     }
 
-    fun addVariable(variable: String) {
-        input_text?.setText("${input_text?.text?.toString()} {$variable}")
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         spinner_text_size?.adapter = ArrayAdapter(
             requireContext(),
             R.layout.item_spinner,
-            ReceiptTextSize.values().map { it.nameRes }
+            ReceiptTemplate.TextSize.values().map { it.nameRes }
         )
 
         input_text?.setText(el.text)
@@ -52,8 +48,8 @@ class TextFormatDialog(
             else -> 1
         }
         radio_alignment?.checkByPosition(pos)
-        check_bold?.isChecked = el.style.contains(ReceiptStyle.BOLD) == true
-        check_underlined?.isChecked = el.style.contains(ReceiptStyle.UNDERLINED) == true
+        check_bold?.isChecked = el.style.contains(ReceiptTemplate.TextStyle.BOLD) == true
+        check_underlined?.isChecked = el.style.contains(ReceiptTemplate.TextStyle.UNDERLINED) == true
 
         input_text?.addTextChangedListener {
             el.text = input_text?.text.toString()
@@ -71,17 +67,17 @@ class TextFormatDialog(
         }
         check_bold?.setOnCheckedChangeListener { _, b ->
             if (b) {
-                el.style.add(ReceiptStyle.BOLD)
+                el.style.add(ReceiptTemplate.TextStyle.BOLD)
             } else {
-                el.style.remove(ReceiptStyle.BOLD)
+                el.style.remove(ReceiptTemplate.TextStyle.BOLD)
             }
             updateUi()
         }
         check_underlined?.setOnCheckedChangeListener { _, b ->
             if (b) {
-                el.style.add(ReceiptStyle.UNDERLINED)
+                el.style.add(ReceiptTemplate.TextStyle.UNDERLINED)
             } else {
-                el.style.remove(ReceiptStyle.UNDERLINED)
+                el.style.remove(ReceiptTemplate.TextStyle.UNDERLINED)
             }
             updateUi()
         }
@@ -91,7 +87,7 @@ class TextFormatDialog(
             }
 
             override fun onSpinnerClosed(spin: Spinner?) {
-                el.size = ReceiptTextSize.values()[spinner_text_size?.selectedItemPosition!!]
+                el.size = ReceiptTemplate.TextSize.values()[spinner_text_size?.selectedItemPosition!!]
                 updateUi()
             }
 
@@ -107,8 +103,12 @@ class TextFormatDialog(
         }
 
         btn_add_variable?.setOnClickListener {
-            VariableDialog().show(childFragmentManager, null)
+            VariableDialog(this).show(childFragmentManager, null)
         }
+    }
+
+    override fun onVariableSelected(variable: String) {
+        input_text?.setText("${input_text?.text?.toString()} {$variable}")
     }
 
     private fun updateUi() {

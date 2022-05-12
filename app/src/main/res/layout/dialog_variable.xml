@@ -22,26 +22,28 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/tvText"
+                android:id="@+id/text_common"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
+                android:drawableEnd="@drawable/ic_baseline_help_24"
+                android:drawablePadding="4dp"
                 android:text="Общие" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/tvText"
+                android:layout_toStartOf="@id/text_common"
                 android:background="@color/colorAccent" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_centerVertical="true"
-                android:layout_toEndOf="@id/tvText"
+                android:layout_toEndOf="@id/text_common"
                 android:background="@color/colorAccent" />
         </RelativeLayout>
 
@@ -67,26 +69,28 @@
             app:layout_constraintTop_toBottomOf="@+id/list_variables_common">
 
             <TextView
-                android:id="@+id/tvText1"
+                android:id="@+id/text_product"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
+                android:drawableEnd="@drawable/ic_baseline_help_24"
+                android:drawablePadding="4dp"
                 android:text="Продукт" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/tvText1"
+                android:layout_toStartOf="@id/text_product"
                 android:background="@color/colorAccent" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_centerVertical="true"
-                android:layout_toEndOf="@id/tvText1"
+                android:layout_toEndOf="@id/text_product"
                 android:background="@color/colorAccent" />
         </RelativeLayout>
 
@@ -112,32 +116,34 @@
             app:layout_constraintTop_toBottomOf="@+id/list_variables_product">
 
             <TextView
-                android:id="@+id/tvText2"
+                android:id="@+id/text_customizable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
+                android:drawableEnd="@drawable/ic_baseline_help_24"
+                android:drawablePadding="4dp"
                 android:text="Настраиваемые" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/tvText2"
+                android:layout_toStartOf="@id/text_customizable"
                 android:background="@color/colorAccent" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_centerVertical="true"
-                android:layout_toEndOf="@id/tvText2"
+                android:layout_toEndOf="@id/text_customizable"
                 android:background="@color/colorAccent" />
         </RelativeLayout>
 
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list_variables_settings"
+            android:id="@+id/list_variables_customizable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"

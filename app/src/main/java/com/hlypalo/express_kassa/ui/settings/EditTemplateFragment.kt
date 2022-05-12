@@ -15,23 +15,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.ui.main.NavigationFragment
-import com.squareup.moshi.JsonClass
-import kotlinx.android.synthetic.main.fragment_receipt_layout.*
-import java.io.Serializable
+import kotlinx.android.synthetic.main.fragment_edit_template.*
 
-class ReceiptLayoutFragment : Fragment() {
+class ReceiptLayoutFragment : Fragment(), VariableDelegate {
 
-    private val template: ReceiptTemplate = ReceiptTemplate(mutableListOf())
-    private var draggingElement: ReceiptElement? = null
+    private var template: ReceiptTemplate = ReceiptTemplate(mutableListOf())
+    private var draggingElement: ReceiptTemplate.Element? = null
     private var updatedElementRow: Int = 0
     private var updatedElementCol: Int = 0
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putSerializable("template", template)
+        super.onSaveInstanceState(outState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_receipt_layout, container, false)
+        return inflater.inflate(R.layout.fragment_edit_template, container, false)
     }
 
     private fun startDragging(v: TextView) {
@@ -54,6 +57,9 @@ class ReceiptLayoutFragment : Fragment() {
         activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
         activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
         setHasOptionsMenu(true)
+
+        template = (savedInstanceState?.getSerializable("template") as? ReceiptTemplate)
+            ?: ReceiptTemplate(mutableListOf())
 
         layout_drop_area?.setOnDragListener { _, e ->
             when (e.action) {
@@ -85,12 +91,25 @@ class ReceiptLayoutFragment : Fragment() {
             }
         }
 
-        btn_add_settings_variable?.setOnClickListener {
-            val el = ReceiptElement(text = "Text")
+        btn_add_text?.setOnClickListener {
+            val el = ReceiptTemplate.Element(text = "Text")
             template.lines.add(mutableListOf(el))
             updateElement(el, col = 0, row = template.lines.size - 1)
             updateUi()
         }
+
+        btn_add_variable?.setOnClickListener {
+            VariableDialog(this).show(childFragmentManager, null)
+        }
+
+        updateUi()
+    }
+
+    override fun onVariableSelected(variable: String) {
+        val el = ReceiptTemplate.Element(text = "{$variable}")
+        template.lines.add(mutableListOf(el))
+        updateElement(el, col = 0, row = template.lines.size - 1)
+        updateUi()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -127,7 +146,7 @@ class ReceiptLayoutFragment : Fragment() {
         }
     }
 
-    private fun updateElement(el: ReceiptElement, col: Int, row: Int) {
+    private fun updateElement(el: ReceiptTemplate.Element, col: Int, row: Int) {
         updatedElementCol = col
         updatedElementRow = row
         TextFormatDialog(el).show(childFragmentManager, null)
@@ -228,7 +247,7 @@ class ReceiptLayoutFragment : Fragment() {
         }
     }
 
-    private fun getElementView(el: ReceiptElement) : TextView {
+    private fun getElementView(el: ReceiptTemplate.Element) : TextView {
         val tv = TextView(context)
         tv.layoutParams = TableRow.LayoutParams().apply {
             weight = 1F
@@ -238,13 +257,13 @@ class ReceiptLayoutFragment : Fragment() {
         val span = SpannableStringBuilder(el.text)
         el.style.forEach {
             when (it) {
-                ReceiptStyle.BOLD -> {
+                ReceiptTemplate.TextStyle.BOLD -> {
                     span.setSpan(StyleSpan(Typeface.BOLD), 0, span.length, 0)
                 }
-                ReceiptStyle.UNDERLINED -> {
+                ReceiptTemplate.TextStyle.UNDERLINED -> {
                     span.setSpan(UnderlineSpan(), 0, span.length, 0)
                 }
-                ReceiptStyle.ITALIC -> {
+                ReceiptTemplate.TextStyle.ITALIC -> {
                     span.setSpan(StyleSpan(Typeface.ITALIC), 0, span.length, 0)
                 }
             }
@@ -271,25 +290,4 @@ class ReceiptLayoutFragment : Fragment() {
         }
     }
 
-}
-
-@JsonClass(generateAdapter = true)
-data class ReceiptTemplate(
-    val lines: MutableList<MutableList<ReceiptElement>>
-) : Serializable
-
-@JsonClass(generateAdapter = true)
-data class ReceiptElement(
-    var text: String,
-    var alignment: Int = TextView.TEXT_ALIGNMENT_CENTER,
-    var style: MutableList<ReceiptStyle> = mutableListOf(),
-    var size: ReceiptTextSize = ReceiptTextSize.NORMAL
-) : Serializable
-
-enum class ReceiptTextSize(val offset: Int, val nameRes: String) {
-    SMALL(-4, "Мелкий"), NORMAL(0, "Обычный"), BIG(4, "Большой"), LARGE(8, "Огромный")
-}
-
-enum class ReceiptStyle {
-    BOLD, UNDERLINED, ITALIC
 }

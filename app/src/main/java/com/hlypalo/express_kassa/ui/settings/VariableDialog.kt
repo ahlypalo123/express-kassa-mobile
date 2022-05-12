@@ -5,13 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.TooltipCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.util.inflate
 import kotlinx.android.synthetic.main.dialog_variable.*
 
-class VariableDialog : DialogFragment() {
+interface VariableDelegate {
+    fun onVariableSelected(variable: String)
+}
+
+class VariableDialog(
+    private val delegate: VariableDelegate?
+) : DialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,6 +30,15 @@ class VariableDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        TooltipCompat.setTooltipText(text_common, "Общие - переменные, которые либо автоматически расчитываются, либо предопределены в интерфейсе приложения")
+        TooltipCompat.setTooltipText(text_product, "Переменные продукта - это те, которые указываются при создании продукта")
+        TooltipCompat.setTooltipText(text_customizable, "Значение настраевоемой переменной можно предопределить в настройках приложения")
+        listOf<View>(text_common, text_product, text_customizable).forEach {
+            it.setOnClickListener { v ->
+                v.performLongClick()
+            }
+        }
 
         list_variables_common?.layoutManager = GridLayoutManager(context, 2)
         list_variables_common?.adapter = Adapter(arrayOf(
@@ -42,8 +58,8 @@ class VariableDialog : DialogFragment() {
             "Стоимость",
             "Пользовательская переменная",
         ))
-        list_variables_settings?.layoutManager = GridLayoutManager(context, 2)
-        list_variables_settings?.adapter = Adapter(arrayOf(
+        list_variables_customizable?.layoutManager = GridLayoutManager(context, 2)
+        list_variables_customizable?.adapter = Adapter(arrayOf(
             "Наименование предприятия",
             "ИНН",
             "СНО",
@@ -71,7 +87,7 @@ class VariableDialog : DialogFragment() {
             fun bind(text: String) {
                 (itemView as? AppCompatButton)?.text = text
                 itemView.setOnClickListener {
-                    (parentFragment as? TextFormatDialog)?.addVariable(text)
+                    delegate?.onVariableSelected(text)
                     dismiss()
                 }
             }
