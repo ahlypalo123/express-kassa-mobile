@@ -3,8 +3,6 @@ package com.hlypalo.express_kassa
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.SharedPreferences
-import androidx.room.Room
-import com.hlypalo.express_kassa.data.db.AppDatabase
 
 class App : Application() {
 
@@ -15,8 +13,8 @@ class App : Application() {
             private set
         lateinit var prefEditor: SharedPreferences.Editor
             private set
-        lateinit var db: AppDatabase
-            private set
+//        lateinit var db: AppDatabase
+//            private set
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -26,10 +24,10 @@ class App : Application() {
         sharedPrefs = getSharedPreferences(PREFS, MODE_PRIVATE)
         prefEditor = sharedPrefs.edit()
 
-        db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "express_kassa"
-        ).fallbackToDestructiveMigration().build()
+//        db = Room.databaseBuilder(
+//            applicationContext,
+//            AppDatabase::class.java,
+//            "express_kassa"
+//        ).fallbackToDestructiveMigration().build()
     }
 }

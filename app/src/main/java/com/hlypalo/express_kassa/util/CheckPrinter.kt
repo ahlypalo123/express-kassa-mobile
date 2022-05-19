@@ -1,17 +1,11 @@
 package com.hlypalo.express_kassa.util
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.util.Log
-import android.view.Gravity
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.graphics.drawable.toBitmap
-import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.Check
-import com.hlypalo.express_kassa.data.model.PaymentMethod
-import org.joda.time.DateTime
+import com.hlypalo.express_kassa.data.repository.MerchantRepository
 import java.io.IOException
 import java.io.OutputStream
 import java.util.*
@@ -23,6 +17,7 @@ class CheckPrinter(private val context: Context?, private val address: String) {
     }
 
     private lateinit var socket: BluetoothSocket
+    private val merchantRepo: MerchantRepository by lazy { MerchantRepository.instance }
     private var tries = 2
 
     fun init() {
@@ -51,8 +46,11 @@ class CheckPrinter(private val context: Context?, private val address: String) {
 
     inner class Connection(private val os: OutputStream) {
         fun print(check: Check) {
-            val pw = CheckPrinterWriter(context, os)
-            val bmp = CheckBuilder.build(check, context)
+            val pw = BluetoothPrinterWriter(
+                context,
+                os
+            )
+            val bmp = CheckBuilder(context, check, true).build(merchantRepo.getTemplate())
             pw.writeImage(bmp)
         }
 

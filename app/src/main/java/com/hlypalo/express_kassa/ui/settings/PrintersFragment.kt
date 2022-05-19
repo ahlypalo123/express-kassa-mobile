@@ -110,7 +110,7 @@ class PrintersFragment(
         }
         executor.execute {
             try {
-                CheckPrinterUtil.printCheck(getTestCheck(), view, context)
+                BluetoothPrinterUtil.printCheck(getTestCheck(), view, context)
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 view?.post {

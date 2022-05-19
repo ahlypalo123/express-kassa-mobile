@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="edit_photo_options">
-        <item>Load photo from gallery</item>
-        <item>Take a shot</item>
+        <item>Загрузить из галереи</item>
+        <item>Сделать фото</item>
     </string-array>
 </resources>

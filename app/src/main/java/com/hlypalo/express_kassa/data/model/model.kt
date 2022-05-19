@@ -11,7 +11,8 @@ data class Product(
     val name: String,
     val price: Float,
     var photoUrl: String?,
-    val barCode: String?
+    val barCode: String?,
+    val data: Map<String, String>? = null
 ) : Serializable
 
 data class CheckProduct(
@@ -28,6 +29,13 @@ data class ShiftDetails(
     val startDate: Long,
     val endDate: Long
 )
+
+@JsonClass(generateAdapter = true)
+data class ReceiptTemplate (
+    val id: Long = 0,
+    var active: Boolean = false,
+    var data: ReceiptTemplateData = mutableListOf()
+) : Serializable
 
 @Entity
 @JsonClass(generateAdapter = true)
@@ -47,6 +55,8 @@ data class Check(
     var address: String? = null,
     var name: String? = null,
     var taxType: String? = null,
+    val data: Map<String, String>? = null,
+    val merchantData: Map<String, String>? = null
 ) : Serializable
 
 @JsonClass(generateAdapter = true)
@@ -56,5 +66,6 @@ data class MerchantDetails(
     val address: String?,
     val name: String?,
     val taxType: String?,
-    var shift: ShiftDetails? = null
+    var shift: ShiftDetails? = null,
+    val data: Map<String, String>? = null
 )

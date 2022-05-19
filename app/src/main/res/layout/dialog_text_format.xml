@@ -53,43 +53,54 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_text" />
 
-    <RadioGroup
-        android:id="@+id/radio_alignment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_add_variable">
-
-        <RadioButton
-            android:layout_width="84dp"
-            android:layout_height="wrap_content"
-            android:tag="0"
-            android:text="Лево" />
-
-        <RadioButton
-            android:layout_width="84dp"
-            android:layout_height="wrap_content"
-            android:tag="1"
-            android:text="Центр" />
-
-        <RadioButton
-            android:layout_width="84dp"
-            android:layout_height="wrap_content"
-            android:tag="2"
-            android:text="Право" />
-
-    </RadioGroup>
-
-    <com.hlypalo.express_kassa.util.CustomSpinner
-        android:id="@+id/spinner_text_size"
-        android:layout_width="match_parent"
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggle_alignment"
+        android:layout_width="wrap_content"
+        app:singleSelection="true"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radio_alignment" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_add_variable">
+
+        <Button
+            android:id="@+id/btn_align_left"
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            app:iconSize="24dp"
+            android:tag="0"
+            app:icon="@drawable/ic_align_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btn_align_center"
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            app:iconSize="24dp"
+            android:tag="1"
+            app:icon="@drawable/ic_align_center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btn_align_right"
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            app:iconSize="24dp"
+            android:tag="2"
+            app:icon="@drawable/ic_align_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <com.hlypalo.express_kassa.util.CustomSpinner
+        android:id="@+id/spinner_text_size"
+        android:background="@drawable/shape_gray_border_radius_18"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:padding="8dp"
+        android:layout_margin="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toggle_alignment" />
 
     <CheckBox
         android:id="@+id/check_bold"
@@ -136,7 +147,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="48dp"
-        android:background="@drawable/shape_blue_border"
+        android:background="@drawable/shape_blue_border_radius_32"
         android:text="Удалить"
         android:textAllCaps="false"
         app:layout_constraintVertical_bias="0"

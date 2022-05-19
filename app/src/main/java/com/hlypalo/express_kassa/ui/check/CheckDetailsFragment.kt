@@ -11,6 +11,7 @@ import com.hlypalo.express_kassa.util.*
 import kotlinx.android.synthetic.main.fragment_check_details.*
 import kotlinx.android.synthetic.main.fragment_check_details.image_check
 import kotlinx.android.synthetic.main.fragment_check_details.toolbar
+import org.apache.xmlbeans.impl.schema.SchemaTypeLoaderImpl.build
 
 
 class CheckDetailsFragment(private var check: Check) : Fragment() {
@@ -41,10 +42,10 @@ class CheckDetailsFragment(private var check: Check) : Fragment() {
         activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
         setHasOptionsMenu(true)
 
-        bitmap = CheckBuilder.build(check, context)
+        bitmap = CheckBuilder(context, check!!).build(null)
         image_check?.setImageBitmap(bitmap)
         btn_print?.setOnClickListener {
-            CheckPrinterUtil.printCheck(check, view, context)
+            BluetoothPrinterUtil.printCheck(check, view, context)
         }
     }
 

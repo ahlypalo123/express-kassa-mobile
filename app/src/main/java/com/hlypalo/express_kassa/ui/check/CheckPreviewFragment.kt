@@ -9,19 +9,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.repository.CheckRepository
+import com.hlypalo.express_kassa.data.repository.MerchantRepository
 import com.hlypalo.express_kassa.util.CheckBuilder
 import kotlinx.android.synthetic.main.fragment_check.*
 import kotlinx.android.synthetic.main.fragment_check.image_check
 import kotlinx.android.synthetic.main.fragment_check.toolbar
 import kotlinx.android.synthetic.main.fragment_check_details.*
+import kotlinx.android.synthetic.main.fragment_free_sale.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CheckFragment : Fragment() {
+class CheckPreviewFragment : Fragment() {
 
     private val repo: CheckRepository by lazy { CheckRepository() }
+    private val merchantRepo: MerchantRepository by lazy { MerchantRepository.instance }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,19 +56,8 @@ class CheckFragment : Fragment() {
     }
 
     fun updateUi() {
-        val check = repo.getCheck()
-
-        CheckBuilder.build(check!!, context).let {
+        CheckBuilder(context, repo.getCheck()!!).build(merchantRepo.getTemplate()).let {
             image_check?.setImageBitmap(it)
-        }
-
-        if (check.inn.isNullOrBlank() || check.name.isNullOrBlank() ||
-            check.address.isNullOrBlank() || check.taxType.isNullOrBlank()
-        ) {
-            layout_hint1?.visibility = View.VISIBLE
-        }
-        if (check.employeeName.isNullOrBlank()) {
-            layout_hint2?.visibility = View.VISIBLE
         }
     }
 

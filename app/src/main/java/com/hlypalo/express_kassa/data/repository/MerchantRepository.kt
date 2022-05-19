@@ -3,37 +3,36 @@ package com.hlypalo.express_kassa.data.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.hlypalo.express_kassa.data.api.ApiService
-import com.hlypalo.express_kassa.data.model.ErrorBody
-import com.hlypalo.express_kassa.data.model.MerchantDetails
-import com.hlypalo.express_kassa.data.model.ShiftRequest
+import com.hlypalo.express_kassa.data.model.*
 import com.hlypalo.express_kassa.util.enqueue
 
 class MerchantRepository private constructor() {
 
     private val api: ApiService by lazy { ApiService.getInstance() }
-    private val liveData: MutableLiveData<MerchantDetails> by lazy { MutableLiveData() }
+    private val merchantLiveData: MutableLiveData<MerchantDetails> by lazy { MutableLiveData() }
+    private val templateLiveData: MutableLiveData<ReceiptTemplateData> by lazy { MutableLiveData() }
 
     companion object {
         val instance = MerchantRepository()
     }
 
     fun getMerchantDetails() : MerchantDetails? {
-        return liveData.value
+        return merchantLiveData.value
     }
 
     fun clearCache() {
-        liveData.postValue(null)
+        merchantLiveData.postValue(null)
     }
 
     fun initMerchantDetails() : LiveData<MerchantDetails> {
-        if (liveData.value == null) {
+        if (merchantLiveData.value == null) {
             api.getMerchantDetails().enqueue {
                 onResponse = {
-                    liveData.postValue(it)
+                    merchantLiveData.postValue(it)
                 }
             }
         }
-        return liveData
+        return merchantLiveData
     }
 
     fun updateMerchantDetails(
@@ -43,7 +42,7 @@ class MerchantRepository private constructor() {
     ) {
         api.updateMerchantDetails(data).enqueue {
             onResponse = {
-                liveData.postValue(it)
+                merchantLiveData.postValue(it)
                 callback()
             }
             onError = {
@@ -58,9 +57,9 @@ class MerchantRepository private constructor() {
     ) {
         api.openShift(req).enqueue {
             onResponse = {
-                val details = liveData.value
+                val details = merchantLiveData.value
                 details?.shift = it
-                liveData.postValue(details)
+                merchantLiveData.postValue(details)
             }
             onError = {
                 error(it)
@@ -71,9 +70,9 @@ class MerchantRepository private constructor() {
     fun closeShift(error: (ErrorBody?) -> Unit) {
         api.closeShift().enqueue {
             onResponse = {
-                val details = liveData.value
+                val details = merchantLiveData.value
                 details?.shift = null
-                liveData.postValue(details)
+                merchantLiveData.postValue(details)
             }
             onError = {
                 error(it)
@@ -81,4 +80,37 @@ class MerchantRepository private constructor() {
         }
     }
 
+    fun initTemplate(error: (ErrorBody?) -> Unit) : LiveData<ReceiptTemplateData> {
+        if (templateLiveData.value == null) {
+            api.getReceiptTemplate().enqueue {
+                onResponse = {
+                    templateLiveData.postValue(it?.data)
+                }
+                onError = {
+                    error(it)
+                }
+            }
+        }
+        return templateLiveData
+    }
+
+    fun setActiveTemplate(
+        template: ReceiptTemplate,
+        callback: () -> Unit,
+        error: (ErrorBody?) -> Unit
+    ) {
+        api.setActiveTemplate(template.id).enqueue {
+            onResponse = {
+                templateLiveData.postValue(template.data)
+                callback()
+            }
+            onError = {
+                error(it)
+            }
+        }
+    }
+
+    fun getTemplate() : ReceiptTemplateData? {
+        return templateLiveData.value
+    }
 }

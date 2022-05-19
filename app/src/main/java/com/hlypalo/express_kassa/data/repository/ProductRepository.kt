@@ -1,13 +1,9 @@
 package com.hlypalo.express_kassa.data.repository
 
-import android.content.SharedPreferences
-import com.google.gson.Gson
-import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.data.api.ApiService
-import com.hlypalo.express_kassa.data.model.Check
-import com.hlypalo.express_kassa.data.model.CheckProduct
 import com.hlypalo.express_kassa.data.model.Product
-import com.hlypalo.express_kassa.util.*
+import com.hlypalo.express_kassa.util.CallBackKt
+import com.hlypalo.express_kassa.util.enqueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import okhttp3.MediaType.Companion.toMediaType

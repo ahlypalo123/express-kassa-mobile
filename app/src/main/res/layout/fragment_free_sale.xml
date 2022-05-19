@@ -136,11 +136,19 @@
         android:layout_margin="16dp"
         android:textColor="@color/textColorPrimary"
         android:textSize="19sp"
-        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_cash"
         tools:text="Сдача: 600" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_add_discount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Добавить скидку"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@+id/text_change" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_check_pay"

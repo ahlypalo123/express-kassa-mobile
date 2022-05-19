@@ -3,9 +3,10 @@ package com.hlypalo.express_kassa.ui.main
 import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.Check
 import com.hlypalo.express_kassa.data.repository.CheckRepository
+import com.hlypalo.express_kassa.data.repository.MerchantRepository
 import com.hlypalo.express_kassa.util.enqueue
 
-open class MainPresenter(
+open class LegacyMainPresenter(
     private val view: MainView
 ) {
 

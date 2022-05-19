@@ -1,6 +1,7 @@
 package com.hlypalo.express_kassa.data.api
 
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonSerializer
 import com.hlypalo.express_kassa.data.model.*
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.Deferred
@@ -75,6 +76,18 @@ interface ApiService {
     @GET("/merchant")
     fun getMerchantDetails() : Call<MerchantDetails>
 
+    @GET("/receipt-template")
+    fun getReceiptTemplate() : Call<ReceiptTemplate>
+
+    @GET("/receipt-templates")
+    fun getReceiptTemplateList() : Call<List<ReceiptTemplate>>
+
+    @PATCH("/receipt-template/{id}")
+    fun setActiveTemplate(@Path("id") id: Long) : Call<Unit>
+
+    @POST("/receipt-template")
+    fun saveReceiptTemplate(@Body data: ReceiptTemplate) : Call<ReceiptTemplate>
+
     companion object {
         var apiService: ApiService? = null
 
@@ -100,6 +113,8 @@ interface ApiService {
                     .addConverterFactory(GsonConverterFactory.create(
                         GsonBuilder()
                             .setLenient()
+                            .registerTypeAdapter(ReceiptElement::class.java, ReceiptElementDeserializer())
+                            .registerTypeAdapter(ReceiptElement::class.java, ReceiptElementSerializer())
                             .create()
                     ))
                     .build()

@@ -10,7 +10,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.CheckProduct
 import com.hlypalo.express_kassa.data.model.ErrorBody
-import com.hlypalo.express_kassa.ui.check.CheckFragment
+import com.hlypalo.express_kassa.ui.check.CheckPreviewFragment
 import com.hlypalo.express_kassa.ui.product.BarCodeFragment
 import com.hlypalo.express_kassa.ui.product.ProductFragment
 import com.hlypalo.express_kassa.util.inflate
@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.item_check_product_main.*
 import kotlinx.android.synthetic.main.item_check_product_main.view.*
 
-class MainFragment : Fragment(), MainProductView {
+class LegacyMainFragment : Fragment(), MainProductView {
 
     private val presenter: MainProductPresenter by lazy { MainProductPresenter(this) }
     private val checkAdapter: CheckItemAdapter by lazy { CheckItemAdapter() }
@@ -87,7 +87,7 @@ class MainFragment : Fragment(), MainProductView {
         activity?.supportFragmentManager
             ?.beginTransaction()
             ?.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-            ?.replace(R.id.container, CheckFragment())
+            ?.replace(R.id.container, CheckPreviewFragment())
             ?.addToBackStack(null)?.commit()
     }
 

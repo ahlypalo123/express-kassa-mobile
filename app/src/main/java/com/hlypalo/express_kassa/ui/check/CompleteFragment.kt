@@ -11,9 +11,10 @@ import androidx.fragment.app.FragmentManager
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.Check
 import com.hlypalo.express_kassa.data.repository.CheckRepository
+import com.hlypalo.express_kassa.data.repository.MerchantRepository
 import com.hlypalo.express_kassa.ui.settings.PrintersFragment
 import com.hlypalo.express_kassa.util.CheckBuilder
-import com.hlypalo.express_kassa.util.CheckPrinterUtil
+import com.hlypalo.express_kassa.util.BluetoothPrinterUtil
 import com.hlypalo.express_kassa.util.compressReceiptToFile
 import com.hlypalo.express_kassa.util.getShareIntent
 import kotlinx.android.synthetic.main.fragment_complete.*
@@ -70,7 +71,7 @@ class CompleteFragment : Fragment() {
         toggleProgress(true)
         executor.execute {
             try {
-                CheckPrinterUtil.printCheck(
+                BluetoothPrinterUtil.printCheck(
                     check = check,
                     view = view,
                     context = context
@@ -112,7 +113,7 @@ class CompleteFragment : Fragment() {
     }
 
     private fun shareCheck() {
-        val file = CheckBuilder.build(check, context)
+        val file = CheckBuilder(context, check).build(null)
             .compressReceiptToFile(context)
 
         val shareIntent = requireContext().getShareIntent(file)

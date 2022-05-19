@@ -9,12 +9,16 @@ import android.widget.*
 import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.hlypalo.express_kassa.R
+import com.hlypalo.express_kassa.data.model.ReceiptTextElement
+import com.hlypalo.express_kassa.data.model.ReceiptTextSize
+import com.hlypalo.express_kassa.data.model.ReceiptTextStyle
 import com.hlypalo.express_kassa.util.CustomSpinner
 import kotlinx.android.synthetic.main.dialog_text_format.*
 
 class TextFormatDialog(
-    private val el: ReceiptTemplate.Element
+    private val el: ReceiptTextElement
 ) : BottomSheetDialogFragment(), VariableDelegate {
 
     override fun onCreateView(
@@ -38,7 +42,7 @@ class TextFormatDialog(
         spinner_text_size?.adapter = ArrayAdapter(
             requireContext(),
             R.layout.item_spinner,
-            ReceiptTemplate.TextSize.values().map { it.nameRes }
+            ReceiptTextSize.values().map { it.nameRes }
         )
 
         input_text?.setText(el.text)
@@ -47,17 +51,18 @@ class TextFormatDialog(
             TextView.TEXT_ALIGNMENT_TEXT_END -> 2
             else -> 1
         }
-        radio_alignment?.checkByPosition(pos)
-        check_bold?.isChecked = el.style.contains(ReceiptTemplate.TextStyle.BOLD) == true
-        check_underlined?.isChecked = el.style.contains(ReceiptTemplate.TextStyle.UNDERLINED) == true
+        toggle_alignment?.checkByPosition(pos)
+        check_bold?.isChecked = el.style.contains(ReceiptTextStyle.BOLD) == true
+        check_underlined?.isChecked = el.style.contains(ReceiptTextStyle.UNDERLINED) == true
 
         input_text?.addTextChangedListener {
             el.text = input_text?.text.toString()
             updateUi()
         }
 
-        radio_alignment?.setOnCheckedChangeListener { _, i ->
-            el.alignment = when (radio_alignment?.getCheckedPosition()!!) {
+        toggle_alignment?.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            val position = view.findViewById<View?>(checkedId)?.tag.toString().toInt()
+            el.alignment = when (position) {
                 0 -> TextView.TEXT_ALIGNMENT_TEXT_START
                 2 -> TextView.TEXT_ALIGNMENT_TEXT_END
                 else -> TextView.TEXT_ALIGNMENT_CENTER
@@ -67,17 +72,17 @@ class TextFormatDialog(
         }
         check_bold?.setOnCheckedChangeListener { _, b ->
             if (b) {
-                el.style.add(ReceiptTemplate.TextStyle.BOLD)
+                el.style.add(ReceiptTextStyle.BOLD)
             } else {
-                el.style.remove(ReceiptTemplate.TextStyle.BOLD)
+                el.style.remove(ReceiptTextStyle.BOLD)
             }
             updateUi()
         }
         check_underlined?.setOnCheckedChangeListener { _, b ->
             if (b) {
-                el.style.add(ReceiptTemplate.TextStyle.UNDERLINED)
+                el.style.add(ReceiptTextStyle.UNDERLINED)
             } else {
-                el.style.remove(ReceiptTemplate.TextStyle.UNDERLINED)
+                el.style.remove(ReceiptTextStyle.UNDERLINED)
             }
             updateUi()
         }
@@ -87,7 +92,7 @@ class TextFormatDialog(
             }
 
             override fun onSpinnerClosed(spin: Spinner?) {
-                el.size = ReceiptTemplate.TextSize.values()[spinner_text_size?.selectedItemPosition!!]
+                el.size = ReceiptTextSize.values()[spinner_text_size?.selectedItemPosition!!]
                 updateUi()
             }
 
@@ -98,7 +103,7 @@ class TextFormatDialog(
         }
 
         btn_delete?.setOnClickListener {
-            (parentFragment as? ReceiptLayoutFragment)?.removeUpdatedElement()
+            (parentFragment as? EditTemplateFragment)?.removeUpdatedElement()
             dismiss()
         }
 
@@ -112,14 +117,11 @@ class TextFormatDialog(
     }
 
     private fun updateUi() {
-        (parentFragment as? ReceiptLayoutFragment)?.updateUi()
+        (parentFragment as? EditTemplateFragment)?.updateUi()
     }
 
-    private fun RadioGroup.checkByPosition(position: Int) {
-        (children.toList()[position] as? RadioButton)?.isChecked = true
+    private fun MaterialButtonToggleGroup.checkByPosition(position: Int) {
+        (children.toList()[position] as? Button)?.id?.let { check(it) }
     }
-
-    private fun RadioGroup.getCheckedPosition() : Int =
-        view?.findViewById<View>(checkedRadioButtonId)?.tag.toString().toInt()
 
 }

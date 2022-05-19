@@ -4,13 +4,19 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.Insets
+import android.graphics.Rect
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Environment
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ClickableSpan
+import android.util.Size
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +24,7 @@ import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -34,6 +41,14 @@ import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import android.view.WindowInsets
+
+import android.view.WindowMetrics
+import android.view.WindowManager
+import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+
 
 const val TAG = "Utils"
 
@@ -260,3 +275,17 @@ fun Bitmap.compressReceiptToFile(context: Context?) : File {
     compress(Bitmap.CompressFormat.JPEG, 100, fos)
     return temp
 }
+
+fun FragmentManager.getCallerFragment(): Fragment? =
+    findFragmentByTag(getBackStackEntryAt(backStackEntryCount - 2).name)
+
+val Number.toPx get() = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    this.toFloat(),
+    Resources.getSystem().displayMetrics)
+
+val Number.toDp get() = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_PX,
+    this.toFloat(),
+    Resources.getSystem().displayMetrics)
+

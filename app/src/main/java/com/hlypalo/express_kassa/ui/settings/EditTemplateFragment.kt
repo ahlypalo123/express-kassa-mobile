@@ -2,30 +2,34 @@ package com.hlypalo.express_kassa.ui.settings
 
 import android.graphics.Canvas
 import android.graphics.Point
-import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
-import android.text.SpannableStringBuilder
-import android.text.style.StyleSpan
-import android.text.style.UnderlineSpan
 import android.view.*
-import android.widget.TableRow
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.ui.main.NavigationFragment
+import com.hlypalo.express_kassa.data.model.*
+import com.hlypalo.express_kassa.util.*
 import kotlinx.android.synthetic.main.fragment_edit_template.*
+import kotlinx.android.synthetic.main.fragment_edit_template.toolbar
+import kotlinx.android.synthetic.main.fragment_free_sale.*
 
-class ReceiptLayoutFragment : Fragment(), VariableDelegate {
+class EditTemplateFragment(
+    private var data: ReceiptTemplateData = mutableListOf(),
+    private var isParent: Boolean = true
+) : Fragment(), VariableDelegate {
 
-    private var template: ReceiptTemplate = ReceiptTemplate(mutableListOf())
-    private var draggingElement: ReceiptTemplate.Element? = null
+    private var draggingElement: ReceiptElement? = null
     private var updatedElementRow: Int = 0
     private var updatedElementCol: Int = 0
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable("template", template)
+        outState.putString("template", Gson().toJson(data))
+        outState.putBoolean("isParent", isParent)
         super.onSaveInstanceState(outState)
     }
 
@@ -37,7 +41,7 @@ class ReceiptLayoutFragment : Fragment(), VariableDelegate {
         return inflater.inflate(R.layout.fragment_edit_template, container, false)
     }
 
-    private fun startDragging(v: TextView) {
+    private fun startDragging(v: View) {
         val maskShadow = DragShadowBuilder(v)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
@@ -51,15 +55,22 @@ class ReceiptLayoutFragment : Fragment(), VariableDelegate {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        savedInstanceState?.getString("template")?.let {
+            Gson().fromJson<ReceiptTemplateData>(it, (object : TypeToken<ReceiptTemplateData>() {}).type)
+        }
+        savedInstanceState?.getBoolean("isParent")?.let {
+            isParent = it
+        }
+
+        btn_add_list?.visibility = if (isParent) View.VISIBLE else View.GONE
+
         val activity = activity as AppCompatActivity?
         activity?.setSupportActionBar(toolbar)
+        activity?.supportActionBar?.title = if (isParent) "Редактирование шаблона" else "Редактирование группы элементов"
         activity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        activity?.supportActionBar?.setDisplayShowTitleEnabled(false)
-        activity?.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_hamburger)
         setHasOptionsMenu(true)
 
-        template = (savedInstanceState?.getSerializable("template") as? ReceiptTemplate)
-            ?: ReceiptTemplate(mutableListOf())
+        layout_drop_area?.layoutParams?.width = getPreviewLayoutWidth(context)
 
         layout_drop_area?.setOnDragListener { _, e ->
             when (e.action) {
@@ -80,7 +91,7 @@ class ReceiptLayoutFragment : Fragment(), VariableDelegate {
                         R.drawable.shape_dashed_lines
                     )
 
-                    template.lines.add(mutableListOf(draggingElement!!))
+                    data.add(mutableListOf(draggingElement!!))
                     updateUi()
 
                     true
@@ -92,9 +103,9 @@ class ReceiptLayoutFragment : Fragment(), VariableDelegate {
         }
 
         btn_add_text?.setOnClickListener {
-            val el = ReceiptTemplate.Element(text = "Text")
-            template.lines.add(mutableListOf(el))
-            updateElement(el, col = 0, row = template.lines.size - 1)
+            val el = ReceiptTextElement(text = "Text")
+            data.add(mutableListOf(el))
+            updateElement(el, col = 0, row = data.size - 1)
             updateUi()
         }
 
@@ -102,23 +113,57 @@ class ReceiptLayoutFragment : Fragment(), VariableDelegate {
             VariableDialog(this).show(childFragmentManager, null)
         }
 
+        btn_add_list?.setOnClickListener {
+            val el = ReceiptListElement(
+                data = mutableListOf(),
+                groupType = ReceiptElementGroupType.LIST
+            )
+            data.add(mutableListOf(el))
+            updateElement(el, col = 0, row = data.size - 1)
+            updateUi()
+        }
+
+        btn_done?.setOnClickListener {
+            val caller = parentFragmentManager.getCallerFragment()
+            if (caller is EditTemplateFragment) {
+                caller.updateUi()
+            }
+            if (caller is TemplatesFragment) {
+                caller.saveTemplate(data)
+            }
+            parentFragmentManager.popBackStack()
+        }
+
         updateUi()
     }
 
+    fun updateUi() {
+        layout_drop_area?.removeAllViews()
+
+        data.forEachIndexed { rowInd, row ->
+            val tr = createRow(context, layout_drop_area)
+            row.forEachIndexed { colInd, el ->
+                val v = getElementView(el)
+                addViewToRow(v, tr)
+                addDragListener(v, rowInd, colInd)
+                v?.setOnClickListener {
+                    updateElement(el, rowInd, colInd)
+                }
+            }
+        }
+    }
+
     override fun onVariableSelected(variable: String) {
-        val el = ReceiptTemplate.Element(text = "{$variable}")
-        template.lines.add(mutableListOf(el))
-        updateElement(el, col = 0, row = template.lines.size - 1)
+        val el = ReceiptTextElement(text = "{$variable}")
+        data.add(mutableListOf(el))
+        updateElement(el, col = 0, row = data.size - 1)
         updateUi()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                val fragment = activity?.supportFragmentManager
-                    ?.findFragmentByTag(NavigationFragment::class.java.simpleName)
-                (fragment as? NavigationFragment)?.openDrawer()
-                return true
+                parentFragmentManager.popBackStack()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -128,50 +173,69 @@ class ReceiptLayoutFragment : Fragment(), VariableDelegate {
         deleteElementByPosition(updatedElementRow, updatedElementCol)
     }
 
-    fun updateUi() {
-        layout_drop_area?.removeAllViews()
+    private fun getElementView(el: ReceiptElement) : View? {
+        return when(el) {
+            is ReceiptTextElement -> getViewForTextElement(el, context)
+            is ReceiptListElement -> getViewForListElement(el)
+            is ReceiptImageElement -> {
+                ImageView(context)
+            }
+            else -> null
+        }
+    }
 
-        template.lines.forEachIndexed { iRow, line ->
-            val tr = TableRow(context)
-            layout_drop_area?.addView(tr)
-
-            line.forEachIndexed { iCol, el ->
+    private fun getViewForListElement(el: ReceiptListElement) : View {
+        val layout = LinearLayout(context)
+        layout.orientation = LinearLayout.VERTICAL
+        layout.background = ContextCompat.getDrawable(requireContext(), R.drawable.shape_dashed_lines)
+        el.data.forEach { row ->
+            val tr = createRow(context, layout)
+            row.forEach { el ->
                 val v = getElementView(el)
-                addDragListener(v, iRow, iCol)
-                v.setOnClickListener {
-                    updateElement(el, iCol, iRow)
-                }
-                tr.addView(v)
+                addViewToRow(v, tr)
+            }
+        }
+        return layout
+    }
+
+    private fun updateElement(el: ReceiptElement, row: Int, col: Int) {
+        updatedElementCol = col
+        updatedElementRow = row
+        when (el) {
+            is ReceiptTextElement -> {
+                TextFormatDialog(el).show(childFragmentManager, null)
+            }
+            is ReceiptListElement -> {
+                parentFragmentManager
+                    .beginTransaction()
+                    .setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+                    .replace(R.id.content_navigation, EditTemplateFragment(el.data, false))
+                    .addToBackStack(null).commit()
             }
         }
     }
 
-    private fun updateElement(el: ReceiptTemplate.Element, col: Int, row: Int) {
-        updatedElementCol = col
-        updatedElementRow = row
-        TextFormatDialog(el).show(childFragmentManager, null)
-    }
-
     private fun deleteElementByPosition(row: Int, col: Int) {
-        template.lines[row].removeAt(col)
-        if (template.lines[row].isEmpty()) {
-            template.lines.removeAt(row)
+        data[row].removeAt(col)
+        if (data[row].isEmpty()) {
+            data.removeAt(row)
         }
         updateUi()
     }
 
-    private fun addDragListener(view: View, row: Int, col: Int) {
+    private fun addDragListener(view: View?, row: Int, col: Int) {
+        view ?: return
         var position = Position.BOTTOM
 
         view.setOnLongClickListener {
-            draggingElement = template.lines[row][col]
-            startDragging(view as TextView)
+            draggingElement = data[row][col]
+            startDragging(view)
             deleteElementByPosition(row, col)
             true
         }
 
         view.setOnDragListener { v, e ->
-            val parent = view.parent as? TableRow
+            val parent = view.parent as? LinearLayout
             when (e.action) {
                 DragEvent.ACTION_DRAG_STARTED -> {
                     layout_drop_area?.setBackgroundResource(
@@ -224,16 +288,16 @@ class ReceiptLayoutFragment : Fragment(), VariableDelegate {
 
                     when (position) {
                         Position.LEFT -> {
-                            template.lines[row].add(col, draggingElement!!)
+                            data[row].add(col, draggingElement!!)
                         }
                         Position.RIGHT -> {
-                            template.lines[row].add(col + 1, draggingElement!!)
+                            data[row].add(col + 1, draggingElement!!)
                         }
                         Position.TOP -> {
-                            template.lines.add(row, mutableListOf(draggingElement!!))
+                            data.add(row, mutableListOf(draggingElement!!))
                         }
                         Position.BOTTOM -> {
-                            template.lines.add(row + 1, mutableListOf(draggingElement!!))
+                            data.add(row + 1, mutableListOf(draggingElement!!))
                         }
                     }
 
@@ -247,46 +311,20 @@ class ReceiptLayoutFragment : Fragment(), VariableDelegate {
         }
     }
 
-    private fun getElementView(el: ReceiptTemplate.Element) : TextView {
-        val tv = TextView(context)
-        tv.layoutParams = TableRow.LayoutParams().apply {
-            weight = 1F
-        }
-        tv.textAlignment = el.alignment
-
-        val span = SpannableStringBuilder(el.text)
-        el.style.forEach {
-            when (it) {
-                ReceiptTemplate.TextStyle.BOLD -> {
-                    span.setSpan(StyleSpan(Typeface.BOLD), 0, span.length, 0)
-                }
-                ReceiptTemplate.TextStyle.UNDERLINED -> {
-                    span.setSpan(UnderlineSpan(), 0, span.length, 0)
-                }
-                ReceiptTemplate.TextStyle.ITALIC -> {
-                    span.setSpan(StyleSpan(Typeface.ITALIC), 0, span.length, 0)
-                }
-            }
-        }
-        tv.text = span
-        tv.textSize = 18F + (el.size.offset)
-        return tv
-    }
-
     private enum class Position {
         LEFT, RIGHT, TOP, BOTTOM
     }
 
-    private class DragShadowBuilder(private val view: TextView?) : View.DragShadowBuilder(view) {
+    private class DragShadowBuilder(private val v: View?) : View.DragShadowBuilder(v) {
         override fun onProvideShadowMetrics(size: Point, touch: Point) {
-            view?.let {
+            v?.let {
                 size.set(it.width, it.height)
                 touch.set(it.width / 2, it.height / 2)
             }
         }
 
         override fun onDrawShadow(canvas: Canvas) {
-            view?.draw(canvas)
+            v?.draw(canvas)
         }
     }
 

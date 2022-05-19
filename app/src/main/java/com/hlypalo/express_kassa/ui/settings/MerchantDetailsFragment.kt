@@ -8,13 +8,10 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.hlypalo.express_kassa.R
-import com.hlypalo.express_kassa.data.api.ApiService
 import com.hlypalo.express_kassa.data.model.MerchantDetails
 import com.hlypalo.express_kassa.data.repository.MerchantRepository
 import com.hlypalo.express_kassa.ui.main.NavigationFragment
-import com.hlypalo.express_kassa.ui.main.MainFragment
 import com.hlypalo.express_kassa.util.confirm
-import com.hlypalo.express_kassa.util.enqueue
 import com.hlypalo.express_kassa.util.showCarouselDialog
 import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_merchant_details.*
@@ -65,7 +62,7 @@ class MerchantDetailsFragment : Fragment() {
             inn = input_inn?.text?.toString(),
             name = input_organization?.text?.toString(),
             taxType = input_tax_type?.text?.toString(),
-            address = input_address?.text?.toString()
+            address = input_address?.text?.toString(),
         )
 
         progress_bar?.visibility = View.VISIBLE

@@ -16,9 +16,8 @@ import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.data.model.Product
-import com.hlypalo.express_kassa.ui.main.FreeSaleFragment
 import com.hlypalo.express_kassa.ui.main.NavigationFragment
-import com.hlypalo.express_kassa.ui.main.MainFragment
+import com.hlypalo.express_kassa.ui.main.LegacyMainFragment
 import com.hlypalo.express_kassa.util.*
 import kotlinx.android.synthetic.main.fragment_navigation.*
 import kotlinx.android.synthetic.main.fragment_products.*
@@ -45,7 +44,7 @@ class ProductFragment : Fragment(), ProductView {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupActionBar()
 
-        btn_product_add?.visibility = if (parentFragment is MainFragment) {
+        btn_product_add?.visibility = if (parentFragment is LegacyMainFragment) {
             View.GONE
         } else {
             View.VISIBLE
@@ -79,7 +78,7 @@ class ProductFragment : Fragment(), ProductView {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_products, menu)
-        menu.findItem(R.id.interface_free_sale).isVisible = parentFragment is MainFragment
+        menu.findItem(R.id.interface_free_sale).isVisible = parentFragment is LegacyMainFragment
         val searchBar = menu.findItem(R.id.search_bar).actionView as? SearchView
 
         searchBar?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -182,7 +181,7 @@ class ProductFragment : Fragment(), ProductView {
                         R.drawable.image
                     )
                 }
-                if (parentFragment is MainFragment) {
+                if (parentFragment is LegacyMainFragment) {
                     setOnClickListener {
                         presenter.addProductToCheck(item)
                     }

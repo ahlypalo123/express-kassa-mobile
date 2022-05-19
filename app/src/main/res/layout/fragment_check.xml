@@ -98,22 +98,13 @@
         </androidx.cardview.widget.CardView>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_add_discount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="Добавить скидку"
-            android:textAllCaps="false"
-            app:layout_constraintTop_toBottomOf="@+id/cardView" />
-
-        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_continue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="Продолжить"
             android:textAllCaps="false"
-            app:layout_constraintTop_toBottomOf="@+id/btn_add_discount" />
+            app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

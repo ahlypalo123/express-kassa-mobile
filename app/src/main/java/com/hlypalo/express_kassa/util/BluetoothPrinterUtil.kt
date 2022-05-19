@@ -7,7 +7,7 @@ import com.hlypalo.express_kassa.App
 import com.hlypalo.express_kassa.data.model.Check
 import java.util.*
 
-object CheckPrinterUtil {
+object BluetoothPrinterUtil {
 
     fun printCheck(
         check: Check,

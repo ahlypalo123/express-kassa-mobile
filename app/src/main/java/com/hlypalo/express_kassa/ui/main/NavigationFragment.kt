@@ -17,13 +17,11 @@ import com.hlypalo.express_kassa.data.repository.MerchantRepository
 import com.hlypalo.express_kassa.ui.activity.MainActivity
 import com.hlypalo.express_kassa.ui.check.CheckHistoryFragment
 import com.hlypalo.express_kassa.ui.product.ProductFragment
-import com.hlypalo.express_kassa.ui.settings.MerchantDetailsFragment
-import com.hlypalo.express_kassa.ui.settings.PrintersFragment
-import com.hlypalo.express_kassa.ui.settings.ReceiptLayoutFragment
-import com.hlypalo.express_kassa.ui.settings.ShiftFragment
+import com.hlypalo.express_kassa.ui.settings.*
 import com.hlypalo.express_kassa.util.PREF_INTERFACE_TYPE_FREE_SALE
 import com.hlypalo.express_kassa.util.PREF_TOKEN
 import com.hlypalo.express_kassa.util.PREF_TUTORIAL_VIEWED
+import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_navigation.*
 import kotlinx.android.synthetic.main.layout_drawer_header.*
 
@@ -38,7 +36,7 @@ class NavigationFragment : Fragment() {
             setFragment(if (App.sharedPrefs.getBoolean(PREF_INTERFACE_TYPE_FREE_SALE, false)) {
                 FreeSaleFragment()
             } else {
-                MainFragment()
+                LegacyMainFragment()
             })
         }
     }
@@ -77,6 +75,10 @@ class NavigationFragment : Fragment() {
             return@func true
         }
 
+        repo.initTemplate {
+            activity?.showError(it)
+        }
+
         App.sharedPrefs.registerOnSharedPreferenceChangeListener(listener)
     }
 
@@ -95,7 +97,7 @@ class NavigationFragment : Fragment() {
                 if (App.sharedPrefs.getBoolean(PREF_INTERFACE_TYPE_FREE_SALE, false)) {
                     FreeSaleFragment()
                 } else {
-                    MainFragment()
+                    LegacyMainFragment()
                 }
             }
             R.id.navigation_shift -> {
@@ -112,13 +114,13 @@ class NavigationFragment : Fragment() {
                 PrintersFragment()
             }
             R.id.navigation_receipt -> {
-                ReceiptLayoutFragment()
+                TemplatesFragment()
             }
             R.id.navigation_settings -> {
                 MerchantDetailsFragment()
             }
             else -> {
-                MainFragment()
+                LegacyMainFragment()
             }
         }?.let {
             setFragment(it)
@@ -170,8 +172,8 @@ class NavigationFragment : Fragment() {
     private fun setFragment(fragment: Fragment) {
         childFragmentManager
             .beginTransaction()
-            .replace(R.id.content_navigation, fragment)
-            .commit()
+            .replace(R.id.content_navigation, fragment, fragment::class.simpleName)
+            .addToBackStack(fragment::class.simpleName).commit()
     }
 
 }

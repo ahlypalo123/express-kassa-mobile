@@ -8,11 +8,10 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.repository.CheckRepository
-import com.hlypalo.express_kassa.data.repository.ProductRepository
 import kotlinx.android.synthetic.main.dialog_discount.*
 
 class DiscountDialog(
-    private val delegate: CheckFragment
+    private val delegate: CheckPreviewFragment
 ) : DialogFragment() {
 
     private var disableListeners = false

@@ -4,7 +4,7 @@ import com.hlypalo.express_kassa.data.model.CheckProduct
 
 class MainProductPresenter(
     private val view: MainProductView,
-) : MainPresenter(view) {
+) : LegacyMainPresenter(view) {
 
     fun unsubscribe() {
         repo.unsubscribeFromCheck()

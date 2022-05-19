@@ -30,7 +30,7 @@
                 android:layout_marginEnd="16dp"
                 android:drawableEnd="@drawable/ic_baseline_help_24"
                 android:drawablePadding="4dp"
-                android:text="Общие" />
+                android:text="Check" />
 
             <View
                 android:layout_width="match_parent"
@@ -77,7 +77,7 @@
                 android:layout_marginEnd="16dp"
                 android:drawableEnd="@drawable/ic_baseline_help_24"
                 android:drawablePadding="4dp"
-                android:text="Продукт" />
+                android:text="Product" />
 
             <View
                 android:layout_width="match_parent"
@@ -124,7 +124,7 @@
                 android:layout_marginEnd="16dp"
                 android:drawableEnd="@drawable/ic_baseline_help_24"
                 android:drawablePadding="4dp"
-                android:text="Настраиваемые" />
+                android:text="Global" />
 
             <View
                 android:layout_width="match_parent"

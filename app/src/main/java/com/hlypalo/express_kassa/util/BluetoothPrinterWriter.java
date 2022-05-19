@@ -21,7 +21,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CheckPrinterWriter implements Closeable {
+public class BluetoothPrinterWriter implements Closeable {
 
     private static final String hexStr = "0123456789ABCDEF";
     private static final String[] binaryArray = { "0000", "0001", "0010", "0011",
@@ -34,7 +34,7 @@ public class CheckPrinterWriter implements Closeable {
     private final OutputStream os;
     private boolean first = true;
 
-    public CheckPrinterWriter(Context context, OutputStream os) {
+    public BluetoothPrinterWriter(Context context, OutputStream os) {
         this.os = os;
     }
 

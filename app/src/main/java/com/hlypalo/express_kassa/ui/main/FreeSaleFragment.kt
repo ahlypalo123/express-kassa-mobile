@@ -10,7 +10,7 @@ import com.hlypalo.express_kassa.R
 import com.hlypalo.express_kassa.data.model.CheckProduct
 import com.hlypalo.express_kassa.data.model.ErrorBody
 import com.hlypalo.express_kassa.data.model.PaymentMethod
-import com.hlypalo.express_kassa.ui.check.CheckFragment
+import com.hlypalo.express_kassa.ui.check.CheckPreviewFragment
 import com.hlypalo.express_kassa.util.PREF_INTERFACE_TYPE_FREE_SALE
 import com.hlypalo.express_kassa.util.showError
 import kotlinx.android.synthetic.main.fragment_free_sale.*
@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.fragment_products.toolbar
 
 class FreeSaleFragment : Fragment(), MainView {
 
-    private val presenter: MainPresenter by lazy { MainPresenter(this) }
+    private val presenter: LegacyMainPresenter by lazy { LegacyMainPresenter(this) }
     private var change = 0F
 
     override fun onCreateView(
@@ -40,7 +40,6 @@ class FreeSaleFragment : Fragment(), MainView {
         setHasOptionsMenu(true)
 
         input_total?.addTextChangedListener {
-            input_total?.error = null
             val total = getTotal()
             btn_check_pay?.text = "Оплатить $total"
             if (change == 0F) {
@@ -72,11 +71,6 @@ class FreeSaleFragment : Fragment(), MainView {
 
     private fun pay() {
         val total = getTotal()
-
-        if (total == 0F) {
-            input_total?.error = "Пожалуйста, введите сумму продажи"
-            return
-        }
 
         presenter.check?.let { check ->
             check.cash = getCash()
@@ -125,7 +119,7 @@ class FreeSaleFragment : Fragment(), MainView {
         activity?.supportFragmentManager
             ?.beginTransaction()
             ?.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-            ?.replace(R.id.container, CheckFragment())
+            ?.replace(R.id.container, CheckPreviewFragment())
             ?.addToBackStack(null)?.commit()
     }
 
